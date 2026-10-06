@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="ko"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>순서별 출연자 | NEXT STAGE</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<link rel="stylesheet" href="assets/style.css">
+</head><body>
+<div id="chrome"></div>
+<main class="wrap" id="app"><div id="head"></div>
+<div class="toolbar noprint"><span class="tag orange">단 높이와 위치는 미확정: 배치는 현재 안입니다</span><button class="pill" onclick="window.print()">인쇄 또는 PDF 저장</button></div>
+<div class="tabpane" data-tab="출연자 시트"><div class="sec-head"><h2>순서별 출연자 시트</h2><p>고정 악기와 등퇴장 출연자를 나누고, 무대 위치, 윙, 마이크, 조명을 한 표로 정리했습니다</p></div>
+<div class="tablewrap" style="margin-bottom:72px"><table class="t" id="perf"></table></div></div>
+<div class="tabpane" data-tab="곡별 배치도"><div class="sec-head"><h2>순서별 무대 배치도</h2><p>곡마다 출연자 위치와 샤막 상태를 표시했습니다. 진한 표시는 연주 중, 연한 표시는 대기입니다</p></div>
+<div class="plots" id="plots"></div></div>
+</main>
+<div id="foot"></div>
+<script src="assets/data.js"></script><script src="assets/app.js"></script><script src="assets/plan.js"></script>
+<script>
+NS.chrome(8);
+document.getElementById('head').innerHTML=NS.head('출연자','순서별 출연자 및 무대 위치','곡별로 고정 악기와 등퇴장 출연자, 무대 위치, 마이크, 조명을 정리한 표와 배치도입니다. 인쇄하여 현장에서 사용할 수 있습니다');
+var C=NS.D.cues,P=NS.D.pos;
+var rows=C.filter(function(c){return c.kind==='song'||c.kind==='mc';}).map(function(c){
+ var p=P[c.code]||{};
+ var mk=c.mics.length?c.mics.join(' · '):'—';
+ return '<tr><td>'+c.code+'</td><td>'+c.title+'</td><td>'+NS.fixedOf(c)+'</td><td>'+NS.movingOf(c)+'</td><td>'+(p.pos||c.stage)+'</td><td>'+(c.wing||'')+'</td><td>'+mk+'</td><td>'+c.light+'</td></tr>';}).join('');
+document.getElementById('perf').innerHTML='<thead><tr><th>순서</th><th>프로그램</th><th>고정 악기 (이동 없음)</th><th>등퇴장 출연자</th><th>무대 위치</th><th>윙</th><th>마이크</th><th>조명</th></tr></thead><tbody>'+rows+'</tbody>';
+document.getElementById('plots').innerHTML=C.map(function(c){
+ var p=P[c.code]||{};
+ return '<article class="plot">'+NS.stageSvg(c)+'<h3>'+c.code+' · '+c.title+'</h3><p class="sub">'+c.who+'</p><div class="kv"><div>위치<b>'+(p.pos||c.stage)+'</b></div><div>음향<b>'+(p.need||c.audio)+'</b></div><div>조명<b>'+c.light+'</b></div><div>영상<b>'+c.visual+'</b></div></div></article>';}).join('');
+NS.tabs();
+</script></body></html>

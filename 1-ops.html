@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="ko"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>공연 운영 | NEXT STAGE</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<link rel="stylesheet" href="assets/style.css">
+</head><body>
+<div id="chrome"></div>
+<main class="wrap" id="app"><div id="head"></div>
+<div class="toolbar"><div class="seg" id="filter"></div><span style="display:flex;gap:8px;align-items:center"><span class="tag" id="progress"></span><a class="pill ghost" href="images/rundown.svg" download="NEXT_STAGE_rundown.svg">런다운 이미지 저장</a></span></div>
+<div class="tabpane" data-tab="런다운 · 무대 배치"><div class="ctlbar" id="ctl"></div><div class="duo"><div class="card white" style="padding:14px"><div id="board"></div></div><div class="card stage-card"><div class="hd"><span>무대 배치 · 현재 큐</span><span id="layoutTag"></span><span id="scrimTag"></span></div><div id="svg"></div></div></div></div>
+<div class="tabpane" data-tab="큐 진행 · 정보"><div class="rolling" id="rolling"></div>
+<div class="tiles" id="tiles"></div><div id="rev"></div></div>
+<div class="tabpane" data-tab="전체 큐 목록"><section class="block" style="padding-top:64px"><div class="sec-head"><h2>전체 큐 목록</h2><p>행을 누르면 해당 큐로 이동합니다</p></div><div class="tablewrap"><table class="t" id="all"></table></div></section></div>
+</main>
+<div id="foot"></div>
+<script src="assets/data.js"></script><script src="assets/app.js"></script><script src="assets/plan.js"></script>
+<script>
+NS.chrome(1);
+var C=NS.D.cues,S=NS.S;
+document.getElementById('head').innerHTML=NS.head('공연 운영','큐 진행 현황','현재 큐와 다음 큐, 무대 배치, 영상 · 조명 신호를 확인하고 큐를 진행합니다');
+var scrimTxt={down:'샤막 내림 · 영사',up:'샤막 올림'};
+var filt='all';
+function render(){
+ var c=C[S.idx],p=C[S.idx-1],n1=C[S.idx+1],n2=C[S.idx+2];
+ var done=C.filter(function(x){return x.kind==='song';}).filter(function(x,i){return C.indexOf(x)<S.idx;}).length;
+ document.getElementById('progress').textContent='곡 '+done+' / 14 진행';
+ function mini(x,label,dir,i){return '<div class="mini '+(label==='이전 큐'?'past':'')+' '+(!x?'hid':'')+' '+(dir&&x&&x.direct?'direct':'')+'" data-i="'+i+'"><div class="lb"><span>'+label+'</span>'+(x&&x.direct&&label==='다음 큐'?'<span style="color:var(--red)">직결</span>':'')+'</div><div class="t">'+(x?x.code+' '+x.title:'')+'</div><div class="a">'+(x?x.who:'')+'</div></div>';}
+ var st=S.status;
+ document.getElementById('rolling').innerHTML=mini(p,'이전 큐',0,S.idx-1)+
+ '<div class="now"><div style="display:flex;gap:6px;flex-wrap:wrap;justify-content:space-between;align-items:center"><div style="display:flex;gap:6px;flex-wrap:wrap"><span class="tag blue">현재 큐 '+c.code+'</span>'+(c.direct?'<span class="tag red">다음 곡으로 무지연 연결</span>':'')+(c.pending?'<span class="tag orange">확정 대기 항목 있음</span>':'')+'</div><span class="status '+st+'">'+(st==='LIVE'?'진행 중':st==='STANDBY'?'대기':'정지')+'</span></div><h2>'+c.title+'</h2><div class="who"><b>'+c.who+'</b>'+(c.est?' · 예상 '+c.est:'')+'</div><div class="flow">'+NS.esc(c.call)+'</div><div class="bar"><div class="btns"><button class="btn" data-a="prev">이전</button><button class="btn '+(st==='STANDBY'?'on':'')+'" data-a="STANDBY">대기</button><button class="btn go" data-a="GO">시작</button><button class="btn" data-a="HOLD">정지</button><button class="btn next" data-a="next">다음 큐</button></div><div class="remain"><small>진행 시간</small><span>'+NS.fmt(S.elapsed)+'</span></div></div></div>'+
+ mini(n1,'다음 큐',1,S.idx+1)+mini(n2,'그다음 큐',0,S.idx+2);
+ document.getElementById('svg').innerHTML=NS.stageSvg(c);document.getElementById('board').innerHTML=NS.rundownSvg({idx:S.idx});
+ document.getElementById('ctl').innerHTML='<div class="ctl-l"><span class="tag blue">현재 큐 '+c.code+'</span><b>'+c.title+'</b><span class="sub">'+c.who+'</span></div><div class="btns"><button class="btn" data-a="prev">이전</button><button class="btn '+(st==='STANDBY'?'on':'')+'" data-a="STANDBY">대기</button><button class="btn go" data-a="GO">시작</button><button class="btn" data-a="HOLD">정지</button><button class="btn next" data-a="next">다음 큐</button></div><div class="remain"><small>진행 시간</small><span>'+NS.fmt(S.elapsed)+'</span></div><span class="status '+st+'">'+(st==='LIVE'?'진행 중':st==='STANDBY'?'대기':'정지')+'</span>';
+ document.getElementById('layoutTag').innerHTML=c.layout==='center'?'<span class="tag orange">국악기 중앙 배치 (이 곡만)</span>':'';
+ document.getElementById('scrimTag').innerHTML='<span class="tag '+(c.scrim==='down'?'purple':'')+'">'+scrimTxt[c.scrim]+'</span>';
+ var mk=c.mics.length?c.mics.join(' · '):'없음';
+ var tl=function(l,v,k){return v?'<div class="tile '+(k||'')+'"><span>'+l+'</span><b>'+v+'</b></div>':'';};
+ document.getElementById('tiles').innerHTML=tl('무대 · 동선',c.stage,'t-stage')+tl('음향',c.audio,'t-audio')+tl('조명',c.light,'t-light')+tl('영상',c.visual+' · '+scrimTxt[c.scrim],'t-video')+tl('마이크',mk,'t-mic')+tl('등퇴장',NS.movingOf(c)+(c.wing?' ('+c.wing+')':''),'t-move')+tl('고정 악기',NS.fixedOf(c),'t-fix')+tl('다음 호출',c.call,'t-call');
+ document.getElementById('rev').innerHTML=c.rev?'<div class="revbox"><b>10/6 반영 · 확인 사항</b><ul>'+c.rev.map(function(r){return '<li>'+r+'</li>';}).join('')+'</ul></div>':'';
+ var rows=C.map(function(x,i){return '<tr data-i="'+i+'" class="'+(i===S.idx?'cur':'')+'" style="cursor:pointer"><td>'+x.code+'</td><td>'+x.title+'</td><td>'+x.who+'</td><td>'+NS.esc(x.call)+'</td></tr>';}).join('');
+ document.getElementById('all').innerHTML='<thead><tr><th>번호</th><th>프로그램</th><th>출연 · 담당</th><th>호출 · 신호</th></tr></thead><tbody>'+rows+'</tbody>';
+}
+function act(a){
+ if(a==='next'&&S.idx<C.length-1){S.idx++;S.status='STANDBY';}
+ else if(a==='prev'&&S.idx>0){S.idx--;S.status='STANDBY';}
+ else if(a==='GO'){S.status='LIVE';}else if(a==='STANDBY'||a==='HOLD'){S.status=a;}
+ NS.save();render();
+}
+document.getElementById('app').addEventListener('click',function(e){
+ var b=e.target.closest('[data-a]');if(b){act(b.dataset.a);return;}
+ var m=e.target.closest('[data-i]');if(m){var i=+m.dataset.i;if(i>=0&&i<C.length){S.idx=i;S.status='STANDBY';NS.save();render();}}
+});
+document.addEventListener('keydown',function(e){if(e.code==='Space'&&!/INPUT|BUTTON/.test(e.target.tagName)){e.preventDefault();act('GO');}});
+var tk=document.getElementById('filter');tk.innerHTML='<button class="on" data-reset="1">진행 시간 초기화</button>';
+tk.addEventListener('click',function(e){if(e.target.dataset.reset){S.elapsed=0;S.status='STANDBY';S.idx=0;NS.save();render();}});
+setInterval(function(){[].forEach.call(document.querySelectorAll('.remain span'),function(r){r.textContent=NS.fmt(S.elapsed);});},1000);
+document.getElementById('app').classList.add('wide');
+render();
+NS.tabs();
+</script></body></html>

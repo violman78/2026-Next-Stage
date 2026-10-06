@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="ko"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>좌석 구역 | NEXT STAGE</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<link rel="stylesheet" href="assets/style.css">
+</head><body>
+<div id="chrome"></div>
+<main class="wrap" id="app"><script src="assets/seats.js"></script>
+<div id="head"></div>
+<div class="printhead"><h1>NEXT STAGE 좌석 구역 배치 · 2026.10.07 19:30 · 빛고을시민문화관 공연장</h1></div>
+<div class="toolrow noprint" id="tools"></div>
+<div class="tabpane" data-tab="좌석 배치도"><div class="brushbar noprint" id="brushes"></div><div class="seatwrap" id="seatwrap"><div id="seatsvg"></div></div><p class="sub noprint" style="margin-top:12px" id="hint"></p></div>
+<div class="tabpane" data-tab="구역 요약"><div class="tablewrap"><table class="t" id="sumtab"></table></div><p class="sub" style="margin-top:12px">운영 메모는 칸을 눌러 바로 수정할 수 있고 자동 저장됩니다. 구분별 좌석 수는 배치도의 지정 상태를 따라 자동 계산됩니다</p></div>
+<div class="tabpane noprint" data-tab="좌석 목록"><div class="toolrow"><select id="listfilter" class="tbtn" style="padding:9px 14px"></select><span class="sub" id="listcount"></span></div><div class="tablewrap"><table class="t" id="seatlist"></table></div></div></main>
+<div id="foot"></div>
+<script src="assets/data.js"></script><script src="assets/app.js"></script><script src="assets/plan.js"></script>
+<script>
+NS.chrome(11);
+document.getElementById('head').innerHTML=NS.head('좌석 구역','좌석 구역 배치도','빛고을시민문화관 공연장 715석(일반 693, 장애인 22)의 구역 구분입니다. 구역은 제안안이며 촬영 카메라 위치는 영상 감독 확인 후 확정합니다');
+var SD=window.NS_SEATS,KEY='ns_seats_v1';
+var CATS=[['vip','VIP · 귀빈석','#FFD966'],['cam','촬영팀 카메라 · 장비석','#9DC3E6'],['photo','사진 촬영석','#A9D8D0'],['guest','초청석 (출연진 · 객원 가족)','#C6E0B4'],['gen','일반 관객','#FFFFFF']];
+var NAME={},COL={};CATS.forEach(function(c){NAME[c[0]]=c[1];COL[c[0]]=c[2];});
+var LOC={vip:['1층 나구역 2~5열 중앙 7석×4열','초대장 · 명찰 확인 후 어셔 안내. 1열(무대 최근접)은 음향 압박과 시야각 문제로 제외'],
+cam:['1층 나구역 9~11열 중앙(메인 카메라 3석×3열), 2층 마구역 1열 중앙(와이드 카메라)','좌석 판매 제외(촬영 좌석 블록). 삼각대 · 케이블 동선 확보, 객석 조명 최소화. 극장 기술자료상 객석 촬영은 불가 방침이라 사전 협의 필요'],
+photo:['1층 가 · 다구역 6~7열 통로측','무음 촬영, 플래시 금지 사전 공지. 공연 직전 도착이므로 어셔가 안내. 극장 촬영 방침 사전 협의 필요'],
+guest:['1층 가 · 다구역 1~5열 (무대 좌 · 우 앞)','출연진 · 객원 연주자 가족과 초청. 콜타임 이후 입장 순으로 배정'],
+gen:['나구역 잔여, 가 · 다구역 6열 이후, 2 · 3층 전체','일반 판매 · 초청. 2 · 3층은 신청 현황에 따라 순차 개방']};
+var st={map:{},memo:{}};try{var raw=localStorage.getItem(KEY);if(raw){var o=JSON.parse(raw);st.map=o.map||{};st.memo=o.memo||{};}}catch(e){}
+function sid(s){return s.f+'-'+s.s+'-'+s.r+'-'+s.n;}
+var BYID={};SD.seats.forEach(function(s){BYID[sid(s)]=s;});
+function cat(s){return st.map[sid(s)]||s.c;}
+function setCat(s,c){var k=sid(s);if(c===s.c)delete st.map[k];else st.map[k]=c;}
+function persist(){try{localStorage.setItem(KEY,JSON.stringify(st));}catch(e){}}
+function toast(t){var e=document.getElementById('toast');if(!e){e=document.createElement('div');e.id='toast';e.className='toast';document.body.appendChild(e);}e.textContent=t;e.classList.add('on');clearTimeout(toast.t);toast.t=setTimeout(function(){e.classList.remove('on');},1800);}
+// ---- 도면 SVG
+function drawSvg(){
+ var W=SD.W+24,H=SD.H+8,o='<svg xmlns="http://www.w3.org/2000/svg" id="seatsvg-el" viewBox="0 0 '+W+' '+H+'" font-family="Pretendard Variable,Pretendard,Apple SD Gothic Neo,sans-serif" role="img" aria-label="좌석 배치도"><rect width="'+W+'" height="'+H+'" fill="#fff"/>';
+ var s=SD.stage;o+='<rect x="'+s[0]+'" y="'+s[1]+'" width="'+s[2]+'" height="'+s[3]+'" rx="10" fill="#ececef" stroke="#c9c9ce"/><text x="'+(s[0]+s[2]/2)+'" y="'+(s[1]+s[3]/2+7)+'" text-anchor="middle" font-size="22" font-weight="700" fill="#6e6e73" letter-spacing="14">무 대</text>';
+ SD.labels.forEach(function(l){var sec=l.t&&l.t.length===1;o+=(sec?'<rect x="'+l.x+'" y="'+l.y+'" width="'+l.w+'" height="'+l.h+'" rx="6" fill="#FFCCCC"/>':'')+'<text x="'+(l.x+l.w/2)+'" y="'+(l.y+l.h/2+6)+'" text-anchor="middle" font-size="'+(sec?15:17)+'" font-weight="700" fill="#1d1d1f">'+l.t+'</text>';});
+ SD.dis.forEach(function(d){o+='<rect x="'+d.x+'" y="'+d.y+'" width="'+d.w+'" height="'+d.h+'" rx="5" fill="#FFFFCC" stroke="#e0dc8a"/><text x="'+(d.x+d.w/2)+'" y="'+(d.y+d.h/2+4)+'" text-anchor="middle" font-size="11" font-weight="700" fill="#6e6e73">장애인석</text>';});
+ SD.seats.forEach(function(q){var c=cat(q);o+='<g class="seat" data-id="'+sid(q)+'"><title>'+q.f+'층 '+q.s+'구역 '+q.r+'열 '+q.n+'번 · '+NAME[c]+'</title><rect x="'+(q.x+1.5)+'" y="'+(q.y+1.5)+'" width="'+(q.w-3)+'" height="'+(q.h-3)+'" rx="4" fill="'+COL[c]+'" stroke="#b9b9c0" stroke-width="1"/><text x="'+(q.x+q.w/2)+'" y="'+(q.y+q.h/2+3.5)+'" text-anchor="middle" font-size="9.5" fill="#3a3a3c" pointer-events="none">'+q.n+'</text></g>';});
+ return o+'</svg>';
+}
+function counts(){var t={};CATS.forEach(function(c){t[c[0]]={1:0,2:0,3:0,all:0};});SD.seats.forEach(function(q){var c=cat(q);t[c][q.f]++;t[c].all++;});return t;}
+var brush='view',hist=[];
+function brushes(){var t=counts();document.getElementById('brushes').innerHTML='<button class="brush '+(brush==='view'?'on':'')+'" data-b="view">보기</button>'+CATS.map(function(c){return '<button class="brush '+(brush===c[0]?'on':'')+'" data-b="'+c[0]+'"><i style="background:'+c[2]+'"></i>'+c[1]+' <b>'+t[c[0]].all+'</b></button>';}).join('')+'<span class="brush" style="border-style:dashed"><i style="background:#FFFFCC"></i>장애인석 22 (원안 유지)</span>';
+ document.getElementById('hint').textContent=brush==='view'?'구분을 고르면 좌석을 눌러 또는 끌어서 지정할 수 있습니다. 좌석에 마우스를 올리면 위치와 구분이 보입니다':'「'+NAME[brush]+'」 지정 중: 좌석을 누르거나 끌어서 칠합니다. 되돌리기로 직전 작업을 취소할 수 있습니다';
+ document.getElementById('seatwrap').classList.toggle('paint',brush!=='view');}
+function summary(){var t=counts(),tot=0;
+ document.getElementById('sumtab').innerHTML='<thead><tr><th>구분</th><th>1층</th><th>2층</th><th>3층</th><th>합계</th><th>위치</th><th>운영 메모 (수정 가능)</th></tr></thead><tbody>'+CATS.map(function(c){var k=c[0],m=(st.memo[k]!==undefined?st.memo[k]:LOC[k][1]);return '<tr><td><span class="tag" style="background:'+c[2]+';border-color:rgba(0,0,0,.2)">'+c[1]+'</span></td><td>'+t[k][1]+'</td><td>'+t[k][2]+'</td><td>'+t[k][3]+'</td><td style="color:var(--ink);font-weight:700">'+t[k].all+'</td><td>'+LOC[k][0]+'</td><td><div class="memo" contenteditable="true" data-k="'+k+'">'+NS.esc(m)+'</div></td></tr>';}).join('')+'<tr><td>합계 (장애인석 제외)</td><td>'+(SD.seats.filter(function(q){return q.f===1;}).length)+'</td><td>'+(SD.seats.filter(function(q){return q.f===2;}).length)+'</td><td>'+(SD.seats.filter(function(q){return q.f===3;}).length)+'</td><td style="color:var(--ink);font-weight:700">'+SD.seats.length+'</td><td colspan="2">장애인석 22석(1층 16 · 2층 6)을 더하면 총 715석</td></tr></tbody>';}
+function list(){var sel=document.getElementById('listfilter');if(!sel.options.length){sel.innerHTML='<option value="spec">지정석만 (일반 제외)</option>'+CATS.map(function(c){return '<option value="'+c[0]+'">'+c[1]+'</option>';}).join('')+'<option value="all">전체 좌석</option>';}
+ var v=sel.value||'spec';var rows=SD.seats.filter(function(q){var c=cat(q);return v==='all'||(v==='spec'?c!=='gen':c===v);});
+ document.getElementById('listcount').textContent=rows.length+'석';
+ document.getElementById('seatlist').innerHTML='<thead><tr><th>층</th><th>구역</th><th>열</th><th>번호</th><th>구분</th></tr></thead><tbody>'+rows.map(function(q){var c=cat(q);return '<tr><td>'+q.f+'층</td><td>'+q.s+'</td><td>'+q.r+'열</td><td>'+q.n+'</td><td><span class="tag" style="background:'+COL[c]+';border-color:rgba(0,0,0,.2)">'+NAME[c]+'</span></td></tr>';}).join('')+'</tbody>';}
+function refresh(){brushes();summary();list();}
+document.getElementById('seatsvg').innerHTML=drawSvg();
+// ---- 칠하기
+var down=false,stroke=null;
+function paint(g){var s=BYID[g.dataset.id];if(!s||cat(s)===brush)return;stroke[g.dataset.id]=cat(s);setCat(s,brush);g.querySelector('rect').setAttribute('fill',COL[brush]);g.querySelector('title').textContent=s.f+'층 '+s.s+'구역 '+s.r+'열 '+s.n+'번 · '+NAME[brush];}
+var wrap=document.getElementById('seatwrap');
+wrap.addEventListener('pointerdown',function(e){var g=e.target.closest('.seat');if(!g||brush==='view')return;down=true;stroke={};paint(g);e.preventDefault();});
+window.addEventListener('pointermove',function(e){if(!down)return;var el=document.elementFromPoint(e.clientX,e.clientY);var g=el&&el.closest&&el.closest('.seat');if(g)paint(g);});
+window.addEventListener('pointerup',function(){if(!down)return;down=false;if(Object.keys(stroke).length){hist.push(stroke);persist();refresh();}});
+document.getElementById('brushes').addEventListener('click',function(e){var b=e.target.closest('[data-b]');if(b){brush=b.dataset.b;brushes();}});
+document.getElementById('listfilter').addEventListener('change',list);
+document.getElementById('sumtab').addEventListener('input',function(e){var k=e.target.dataset.k;if(k){st.memo[k]=e.target.textContent;persist();}});
+// ---- 도구
+function dl(name,mime,text){var a=document.createElement('a');a.href=URL.createObjectURL(new Blob([text],{type:mime}));a.download=name;document.body.appendChild(a);a.click();setTimeout(function(){URL.revokeObjectURL(a.href);a.remove();},500);}
+function csvq(v){v=String(v==null?'':v);return /[",\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v;}
+document.getElementById('tools').innerHTML='<button class="tbtn pri" data-t="save">저장</button><button class="tbtn" data-t="undo">되돌리기</button><button class="tbtn" data-t="reset">원본으로 초기화</button><span class="tbtn sep" style="background:none;padding:0"></span><button class="tbtn" data-t="csv">좌석 CSV</button><button class="tbtn" data-t="sumcsv">구역 요약 CSV</button><button class="tbtn" data-t="json">JSON 저장</button><label class="tbtn" style="cursor:pointer">JSON 불러오기<input type="file" id="jsonin" accept=".json,application/json" style="display:none"></label><button class="tbtn" data-t="svg">도면 이미지(SVG)</button><a class="tbtn" href="files/seat-zones-original.xlsx" download>원본 엑셀</a><button class="tbtn pri" data-t="print">인쇄</button>';
+document.getElementById('tools').addEventListener('click',function(e){var b=e.target.closest('[data-t]');if(!b)return;var t=b.dataset.t;
+ if(t==='save'){persist();toast('저장했습니다 (이 기기)');}
+ else if(t==='undo'){var h=hist.pop();if(!h){toast('되돌릴 작업이 없습니다');return;}Object.keys(h).forEach(function(k){setCat(BYID[k],h[k]);});persist();document.getElementById('seatsvg').innerHTML=drawSvg();refresh();}
+ else if(t==='reset'){if(confirm('모든 지정을 원본 엑셀 상태로 되돌릴까요?')){st.map={};hist=[];persist();document.getElementById('seatsvg').innerHTML=drawSvg();refresh();toast('원본으로 초기화했습니다');}}
+ else if(t==='csv'){var r=['층,구역,열,번호,구분'];SD.seats.forEach(function(q){r.push([q.f+'층',q.s,q.r+'열',q.n,NAME[cat(q)]].map(csvq).join(','));});dl('NEXT_STAGE_좌석구역.csv','text/csv;charset=utf-8','﻿'+r.join('\r\n'));}
+ else if(t==='sumcsv'){var c=counts(),r=['구분,1층,2층,3층,합계,위치,운영 메모'];CATS.forEach(function(x){var k=x[0];r.push([x[1],c[k][1],c[k][2],c[k][3],c[k].all,LOC[k][0],(st.memo[k]!==undefined?st.memo[k]:LOC[k][1])].map(csvq).join(','));});dl('NEXT_STAGE_좌석구역_요약.csv','text/csv;charset=utf-8','﻿'+r.join('\r\n'));}
+ else if(t==='json'){dl('NEXT_STAGE_좌석구역.json','application/json',JSON.stringify({version:1,saved:new Date().toISOString(),map:st.map,memo:st.memo},null,1));}
+ else if(t==='svg'){dl('NEXT_STAGE_좌석배치도.svg','image/svg+xml',document.getElementById('seatsvg-el').outerHTML.replace('<svg ','<svg width="'+(SD.W+24)+'" height="'+(SD.H+8)+'" '));}
+ else if(t==='print'){window.print();}
+});
+document.getElementById('jsonin').addEventListener('change',function(e){var f=e.target.files[0];if(!f)return;var rd=new FileReader();rd.onload=function(){try{var o=JSON.parse(rd.result);st.map=o.map||{};st.memo=o.memo||{};hist=[];persist();document.getElementById('seatsvg').innerHTML=drawSvg();refresh();toast('불러왔습니다');}catch(x){toast('파일을 읽을 수 없습니다');}};rd.readAsText(f);e.target.value='';});
+refresh();
+NS.tabs();
+</script></body></html>

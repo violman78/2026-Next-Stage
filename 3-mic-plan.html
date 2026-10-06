@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="ko"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>음향 | NEXT STAGE</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<link rel="stylesheet" href="assets/style.css">
+</head><body>
+<div id="chrome"></div>
+<main class="wrap" id="app"><div id="head"></div>
+<div class="tabpane" data-tab="곡별 마이크"><div class="row3" style="margin-bottom:56px" id="sum"></div>
+<div class="sec-head"><h2>곡별 보컬 · 코러스 마이크</h2><p>전체 코러스는 스탠드 마이크 4개로 통일합니다 (10/6 음악감독 정리)</p></div>
+<div class="tablewrap" style="margin-bottom:16px"><table class="t" id="vox"></table></div>
+<p class="sub" style="margin-bottom:56px">기악곡은 1 · 2 · 11번입니다. 3번의 무선 마이크 개수는 원문에 숫자가 빠져 1대로 해석했습니다. 확인이 필요합니다</p></div>
+<div class="tabpane" data-tab="고정 · 등퇴장"><div class="row2" style="margin-bottom:56px"><div class="card white"><h3 style="margin-bottom:6px">고정 악기</h3><p class="sub" style="margin-bottom:14px">공연 내내 자리를 지키며 이동이 없습니다</p><div class="kv" id="fixed" style="margin-top:0"></div></div>
+<div class="card white"><h3 style="margin-bottom:6px">등퇴장</h3><p class="sub" style="margin-bottom:14px">곡에 따라 입퇴장하거나 위치를 옮깁니다</p><div class="kv" id="moving" style="margin-top:0"></div></div></div></div>
+<div class="tabpane" data-tab="현장 점검"><div class="sec-head"><h2>마이크 현장 점검</h2><p>마이크별 배터리 교체와 사운드 체크 상태를 이 기기에 저장합니다</p></div>
+<div class="row3" id="mics"></div></div>
+</main>
+<div id="foot"></div>
+<script src="assets/data.js"></script><script src="assets/app.js"></script><script src="assets/plan.js"></script>
+<script>
+NS.chrome(3);
+document.getElementById('head').innerHTML=NS.head('음향','보컬 · 코러스 마이크 플랜','곡별 마이크 구성과 고정 악기, 등퇴장 출연자를 구분한 플랜입니다. 보컬 무선 마이크는 동시 최대 2대를 운용합니다');
+var S=NS.S;S.checks=S.checks||{};
+document.getElementById('sum').innerHTML='<div class="metric"><span class="k">무선 핸드 (보컬)</span><div><div class="v">2<small>대 동시</small></div><p class="d">9 · 10번 듀엣 기준 최대</p></div></div><div class="metric"><span class="k">코러스 스탠드</span><div><div class="v">4<small>개 통일</small></div><p class="d">곡별 2 ~ 4명 사용</p></div></div><div class="metric"><span class="k">보컬 스탠드</span><div><div class="v">1<small>개</small></div><p class="d">5번과 7번 보컬</p></div></div>';
+document.getElementById('vox').innerHTML='<thead><tr><th>곡</th><th>프로그램</th><th>보컬</th><th>보컬 마이크</th><th>코러스</th><th>비고</th></tr></thead><tbody>'+NS.D.vox.map(function(v){var cs=v.chorus===null?'미기재':(v.chorus===0?'없음':v.chorus+'명 · 스탠드');return '<tr><td>'+v.n+'</td><td>'+v.t+'</td><td>'+v.lead+'</td><td><span class="tag '+(v.leadMic.indexOf('무선')===0?'blue':'')+'">'+v.leadMic+'</span></td><td>'+cs+'</td><td>'+v.note+'</td></tr>';}).join('')+'</tbody>';
+document.getElementById('fixed').innerHTML=NS.D.fixedList.map(function(r){return '<div>'+r[0]+'<b>'+r[1]+' · '+r[2]+'</b></div>';}).join('');
+document.getElementById('moving').innerHTML=NS.D.movingList.map(function(r){return '<div>'+r[0]+'<b>'+r[1]+' · '+r[2]+'</b></div>';}).join('');
+document.getElementById('mics').innerHTML=NS.D.mics.map(function(m){var k1=m.k+'b',k2=m.k+'s';return '<div class="card white"><h3 style="margin-bottom:4px">'+m.name+'</h3><p class="sub">'+m.use+'</p><div style="margin-top:12px"><label class="chk" style="padding:10px 0"><input type="checkbox" data-k="'+k1+'" '+(S.checks[k1]?'checked':'')+'><span class="tx"><p>배터리 · 연결 점검</p></span></label><label class="chk" style="padding:10px 0"><input type="checkbox" data-k="'+k2+'" '+(S.checks[k2]?'checked':'')+'><span class="tx"><p>사운드 체크 완료</p></span></label></div></div>';}).join('');
+document.getElementById('app').addEventListener('change',function(e){var k=e.target.dataset.k;if(k){S.checks[k]=e.target.checked;NS.save();}});
+NS.tabs();
+</script></body></html>

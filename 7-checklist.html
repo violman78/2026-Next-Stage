@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="ko"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>실행 체크리스트 | NEXT STAGE</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<link rel="stylesheet" href="assets/style.css">
+</head><body>
+<div id="chrome"></div>
+<main class="wrap" id="app"><div id="head"></div>
+<div class="tabpane" data-tab="점검 목록"><div class="toolbar"><div class="seg" id="seg"></div><div style="min-width:220px"><span class="sub" id="pg"></span><div class="progress"><i id="bar"></i></div></div></div>
+<div class="card white" id="list" style="padding:12px 24px"></div></div>
+<div class="tabpane" data-tab="큐시트 변경 이력"><section class="block" style="padding-top:72px"><div class="sec-head"><h2>큐시트 변경 이력 (9/16 대비)</h2><p>9월 16일 통합 큐시트에서 달라진 부분입니다</p></div><div class="tablewrap"><table class="t" id="revs"></table></div></section></div>
+</main>
+<div id="foot"></div>
+<script src="assets/data.js"></script><script src="assets/app.js"></script><script src="assets/plan.js"></script>
+<script>
+NS.chrome(7);
+document.getElementById('head').innerHTML=NS.head('점검','실행 점검 목록','10월 6일 기준 '+NS.D.checks.length+'개 항목입니다. 우선순위와 담당, 기한을 관리하며 체크 상태는 이 기기에 저장됩니다');
+var S=NS.S;S.checks=S.checks||{};var f='전체';
+var L=NS.D.checks;
+function render(){
+ var rows=L.filter(function(r){return f==='전체'||r[2]===f;});
+ var all=L.length,dn=L.filter(function(r){return S.checks['c'+r[0]];}).length;
+ document.getElementById('pg').textContent='완료 '+dn+' / '+all;document.getElementById('bar').style.width=(dn/all*100)+'%';
+ document.getElementById('list').innerHTML=rows.map(function(r){var d=S.checks['c'+r[0]];
+  return '<label class="chk '+(d?'done':'')+'"><input type="checkbox" data-k="c'+r[0]+'" '+(d?'checked':'')+'><span class="tx"><p>'+r[3]+'</p><small><span class="tag '+(r[2]==='긴급'?'red':r[2]==='높음'?'orange':'')+'">'+r[2]+'</span> '+r[1]+' · 담당 '+r[4]+' · 기한 '+r[5]+' · 근거 '+r[6]+'</small></span></label>';}).join('');
+}
+var seg=document.getElementById('seg');seg.innerHTML=['전체','긴급','높음','보통'].map(function(x){return '<button data-f="'+x+'" class="'+(x===f?'on':'')+'">'+x+'</button>';}).join('');
+seg.addEventListener('click',function(e){if(e.target.dataset.f){f=e.target.dataset.f;[].forEach.call(seg.children,function(b){b.className=b.dataset.f===f?'on':'';});render();}});
+document.getElementById('list').addEventListener('change',function(e){var k=e.target.dataset.k;if(k){S.checks[k]=e.target.checked;NS.save();render();}});
+document.getElementById('revs').innerHTML='<thead><tr><th>큐시트 위치</th><th>기존(09.16)</th><th>수정안</th><th>근거</th></tr></thead><tbody>'+NS.D.revs.map(function(r){return '<tr><td>'+r[1]+'</td><td>'+r[2]+'</td><td>'+r[3]+'</td><td>'+r[4]+'</td></tr>';}).join('')+'</tbody>';
+render();
+NS.tabs();
+</script></body></html>

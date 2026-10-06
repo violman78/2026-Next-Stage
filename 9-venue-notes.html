@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="ko"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>극장 스탭회의 | NEXT STAGE</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<link rel="stylesheet" href="assets/style.css">
+</head><body>
+<div id="chrome"></div>
+<main class="wrap" id="app"><div id="head"></div>
+<div class="row2" style="margin-bottom:72px"><div class="card white"><h3 style="margin-bottom:10px">확인된 사항</h3><div id="decided"></div></div><div class="card white"><h3 style="margin-bottom:10px">협의 대기 사항</h3><div id="pending"></div></div></div>
+<div class="card"><h3>자료 안내</h3><p class="sub" style="margin-top:8px">빛고을시민문화관 기술 스탭회의 음성을 자동 변환한 녹취를 정리했습니다. 변환 과정에서 수치와 이름이 불분명한 부분이 있어, 높이와 장비 수량처럼 중요한 값은 현장에서 한 번 더 확인해야 합니다</p></div></main>
+<div id="foot"></div>
+<script src="assets/data.js"></script><script src="assets/app.js"></script><script src="assets/plan.js"></script>
+<script>
+NS.chrome(9);
+document.getElementById('head').innerHTML=NS.head('극장 협의','극장 기술 협의 사항','빛고을시민문화관 기술 스탭회의의 설치 순서, 안전, 장비, 현장 규칙을 확정 사항과 협의 대기 사항으로 구분했습니다');
+function list(a){return a.map(function(t){return '<div class="issue">'+t+'</div>';}).join('');}
+document.getElementById('decided').innerHTML=list(NS.D.venue.decided);
+document.getElementById('pending').innerHTML=list(NS.D.venue.pending);
+NS.tabs();
+</script></body></html>

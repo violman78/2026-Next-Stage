@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="ko"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>무대 배치도 | NEXT STAGE</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<link rel="stylesheet" href="assets/style.css">
+</head><body>
+<div id="chrome"></div>
+<main class="wrap" id="app"><div id="head"></div>
+<div class="toolbar noprint"><span class="tag orange">단 위치와 높이는 배치안입니다 (확정 전)</span><span style="display:flex;gap:8px"><a class="pill ghost" href="12-drawing-set.html">무대 도면 세트 (단면 · 정면 · 축측 · 수치 계산)</a><a class="pill ghost" href="images/stage-plan.svg" download="NEXT_STAGE_stage-plan.svg">도면 SVG 내려받기</a><button class="pill" onclick="window.print()">인쇄 또는 PDF 저장</button></span></div>
+<div class="tabpane" data-tab="평면도"><div class="sec-head"><h2>평면도 (Ground Plan)</h2><p>극장 도면(BGC-G-A1, 1/100)과 기술자료의 라인셋 위치에 이번 공연의 편성을 올렸습니다. 객석이 아래이고 SR이 화면 왼쪽입니다</p></div>
+<div class="card white" style="padding:16px;margin-bottom:16px"><div id="master"></div></div>
+<div class="row3" style="margin-bottom:24px"><div class="card"><h3>범례</h3><ul class="plain" style="margin-top:12px"><li>보라 굵은 선: 샤막 (#1 장치봉 1.18m)</li><li>주황 선: 조명봉, 주황 사각형: 조명타워</li><li>연한 파랑 띠: 단과 하늘막 사이 후방 간격(후방 통로)</li><li>점선 파랑: SR↔SL 후방 크로스오버, 점선 사각형: 측면 승강</li><li>회색 단: 덧마루 1~3단, 중앙 분할 없이 연속 구성 (색이 진할수록 높음)</li></ul></div>
+<div class="card"><h3>좌표 기준</h3><ul class="plain" style="margin-top:12px"><li>원점은 중심선과 영점선(본무대선)의 교점입니다</li><li>x는 SL 방향이 +, y는 무대 뒤쪽이 +입니다 (단위 m)</li><li>바텐 위치는 영점선에서의 거리입니다</li></ul></div>
+<div class="card"><h3>좌우 표기 확인</h3><p class="sub" style="margin-top:12px">NEXT STAGE 도면 이미지는 화면 왼쪽을 USL로 표기했지만, 극장 표준(무대 위 배우 기준)에서는 화면 왼쪽이 SR입니다. 이 배치도는 극장 표준으로 그렸으며, 밴드(USL)는 객석에서 볼 때 오른쪽에 놓입니다</p></div></div></div>
+<div class="tabpane" data-tab="단면도"><div class="sec-head" style="margin-top:56px"><h2>단면도 (Section): 덧마루 높이 비교</h2><p>덧마루 모듈은 150mm입니다. 단 사이 높이를 15cm로 할지 30cm로 할지가 핵심입니다</p></div>
+<div class="row2" style="margin-bottom:56px"><div class="card white" style="padding:14px"><div id="secA"></div></div><div class="card white" style="padding:14px"><div id="secB"></div></div></div></div>
+<div class="tabpane" data-tab="덧마루 산출"><div class="sec-head"><h2>덧마루 소요 수량 산출</h2><p>극장 보유 덧마루로 두 안을 만들 수 있는지 개략 계산했습니다</p></div>
+<div class="tablewrap" style="margin-bottom:16px"><table class="t" id="calc"></table></div>
+<p class="sub" style="margin-bottom:56px" id="calcnote"></p></div>
+<div class="tabpane" data-tab="좌표표"><div class="sec-head"><h2>배치 좌표표</h2><p>현장에서 바닥에 마킹할 때 기준으로 쓰는 좌표입니다 (m)</p></div>
+<div class="tablewrap" style="margin-bottom:56px"><table class="t" id="coords"></table></div></div>
+<div class="tabpane" data-tab="장비 대조"><div class="sec-head"><h2>소요 장비 및 극장 보유 대조</h2><p>극장 기술자료(2014 ~ 2016년 기준)와 이번 공연의 필요를 맞춰 봤습니다. 현재 보유 상태는 극장에 확인해야 합니다</p></div>
+<div class="tablewrap" style="margin-bottom:56px"><table class="t" id="need"></table></div></div>
+<div class="tabpane" data-tab="기본 정보 · 안전"><div class="row2" style="margin-bottom:56px"><div class="card white"><h3 style="margin-bottom:12px">극장 기본 정보</h3><div class="kv" id="basic" style="margin-top:0"></div></div>
+<div class="card white"><h3 style="margin-bottom:12px">안전 점검</h3><ul class="plain" id="safety"></ul></div></div></div>
+<div class="tabpane" data-tab="라인셋 일람"><div class="sec-head"><h2>라인셋 일람</h2><p>영점선에서의 거리(m)입니다. 단 위에 걸리는 조명 라인은 조명봉 #3과 하늘막 상단 조명입니다</p></div>
+<div class="tablewrap"><table class="t" id="lines"></table></div></div>
+</main>
+<div id="foot"></div>
+<script src="assets/data.js"></script><script src="assets/app.js"></script><script src="assets/plan.js"></script>
+<script>
+NS.chrome(10);
+document.getElementById('head').innerHTML=NS.head('무대 배치','무대 배치도 (Stage Plot)','극장 도면과 기술자료를 기준으로 이번 공연 편성의 배치와 소요 설비를 정리했습니다');
+var P=NS.D.plan;
+document.getElementById('master').innerHTML=NS.planSvg(null,{master:true});
+document.getElementById('secA').innerHTML=NS.sectionSvg(0.15,'안 A · 15cm 단위 3단 (15 / 30 / 45cm)');
+document.getElementById('secB').innerHTML=NS.sectionSvg(0.30,'안 B · 30cm 단위 3단 (30 / 60 / 90cm)');
+var w=P.xout*2, d=1.8, per=w*d, stock=P.stock.reduce(function(a,s){return a+s[1]*s[2];},0);
+function lay(h){return [1,2,3].map(function(n){return Math.round(h*n/0.15);});}
+function row(name,h){var l=lay(h),sum=l[0]+l[1]+l[2],a=sum*per;return '<tr><td>'+name+'</td><td>'+Math.round(h*100)+' / '+Math.round(h*200)+' / '+Math.round(h*300)+' cm</td><td>'+l.join(' · ')+' 층</td><td>'+a.toFixed(0)+' ㎡·층</td><td><span class="tag '+(a<=stock?'green':'red')+'">'+(a<=stock?'보유 범위 내':'보유 초과, 받침통 · 합창단 병용 필요')+'</span></td></tr>';}
+document.getElementById('calc').innerHTML='<thead><tr><th>안</th><th>1 · 2 · 3단 높이</th><th>단별 적층</th><th>필요 면적</th><th>극장 보유 '+stock.toFixed(0)+' ㎡·층 대비</th></tr></thead><tbody>'+row('안 A',0.15)+row('안 B',0.30)+'</tbody>';
+document.getElementById('calcnote').textContent='가정: 각 단은 깊이 1.8m, 전체 폭 '+w.toFixed(1)+'m (중앙 분할 없이 연속 구성), 하늘막에서 '+(12.93-P.tiers[2].y1).toFixed(1)+'m 간격을 둔 위치, 덧마루를 층층이 쌓는 방식입니다. 받침통(300×450×150, 80개)과 3단 합창단(6개)을 쓰면 필요 수량이 줄어듭니다. 실제 구성은 극장 무대감독과 확정하세요';
+var T=P.tiers,m1=(T[0].y0+T[0].y1)/2,m2=(T[1].y0+T[1].y1)/2,m3=(T[2].y0+T[2].y1)/2,f=function(v){return v.toFixed(1);};
+var rows=[['국악기 중앙 (1번)','x −3.4 ~ +3.4, y 1.3 ~ 4.3','바닥 · 돗자리 6.8×3.0m, 5인 (가야금 · 아쟁 · 대금 · 피리 · 모둠북)'],
+['국악기 (2번~)','x +1.6 ~ +5.7, y '+f(m2),'2단 우측 4인 (대금 · 피리 · 가야금 · 아쟁)'],
+['코러스 스탠드 (3 ~ 10번)','x −6.0 ~ −2.4, y '+f(m2),'2단 좌측 4석, 스탠드 마이크 4개 통일, 곡별 2~4명 사용'],
+['스트링','x −5.4 ~ +5.4, y '+f(m1),'1단 앞줄 10인 (Vn 4 · Va 2 · Vc 4)'],
+['밴드 (3단)','Gt x −5.6 · E.B x −4.2 · 건반 x +3.3 · +5.0, y '+f(m3),'기타 · 베이스 · 건반 2'],
+['드럼 (3단)','x −2.2, y '+f(m3+0.1),'드럼 1세트 (오준혁)'],
+['모둠북 (3단)','x +0.05 ~ +1.0, y '+f(m3+0.1),'최지민'],
+['보컬 솔로 (DSC)','x 0, y 1.9','바닥, 마이크 스탠드 (샤막 올린 상태)'],
+['보컬 듀엣 (9 · 10번)','x ±2.2, y 1.9','바닥, SL · SR 양쪽 등장'],
+['보컬 앙상블 (12 ~ 14번)','x −3 ~ +3, y 2.4 · 3.4','바닥 2열 × 7, 14명 (코러스 없음)'],
+['덧마루 1 · 2 · 3단','x −6.6 ~ +6.6, y '+f(T[0].y0)+' ~ '+f(T[2].y1)+' (단별 깊이 1.8m)','중앙 분할 없이 연속, 맨 뒤 하늘막(12.93m)에서 '+f(12.93-T[2].y1)+'m 간격 (배치안)'],
+['측면 승강 (SR · SL)','x ±6.9, y '+f(T[0].y0)+' ~ '+f(T[0].y1),'1단 측면 출입, 안 A 15cm / 안 B 30cm 단차'],
+['후방 간격 (후방 통로)','y '+f(T[2].y1)+' ~ 12.93','단과 하늘막 사이 약 '+f(12.93-T[2].y1)+'m, 후방 이동 통로'],
+['DSC 연기 공간','y 1.18 ~ '+f(T[0].y0),'샤막에서 1단 앞까지 '+f(T[0].y0-1.18)+'m, 보컬 · 코러스 · 앙상블 · 국악(1번)'],
+['사회자','x −2.2 · 0 · +2.2, y 0.55','샤막 앞 3곳 (DSC 우측 · 센터 · 좌측)'],
+['풍물 (14번)','x ±8.3, y 4.1 · 4.9','양 윙 SR 2 · SL 2 진입, 약 4분 연주'],
+['샤막','y 1.18, 폭 15m, 높이 9m','#1 장치봉'],
+['후방 프로젝터','x 0, y 14.9 (개략)','외부 반입, 위치 확인 필요']];
+var fixed=['국악기 (2번~)','코러스 스탠드','스트링','밴드','드럼','모둠북','덧마루','측면 승강','후방 간격','DSC 연기 공간','샤막','후방 프로젝터'];
+function kind(n){if(n.indexOf('국악기 중앙')===0)return '이동 1회';for(var i=0;i<fixed.length;i++)if(n.indexOf(fixed[i])===0)return '고정';return '등퇴장';}
+document.getElementById('coords').innerHTML='<thead><tr><th>구분</th><th>항목</th><th>좌표 (x, y)</th><th>위치와 인원</th></tr></thead><tbody>'+rows.map(function(r){var k=kind(r[0]);return '<tr><td><span class="tag '+(k==='고정'?'blue':'orange')+'">'+k+'</span></td><td style="color:var(--ink);font-weight:600;white-space:nowrap">'+r[0]+'</td><td>'+r[1]+'</td><td>'+r[2]+'</td></tr>';}).join('')+'</tbody>';
+document.getElementById('need').innerHTML='<thead><tr><th>항목</th><th>이번 공연 소요</th><th>극장 보유(자료 기준)</th><th>조치</th></tr></thead><tbody>'+NS.D.spec.need.map(function(r){return '<tr><td>'+r[0]+'</td><td>'+r[1]+'</td><td>'+r[2]+'</td><td>'+r[3]+'</td></tr>';}).join('')+'</tbody>';
+document.getElementById('basic').innerHTML=NS.D.spec.basic.map(function(r){return '<div>'+r[0]+'<b>'+r[1]+'</b></div>';}).join('');
+document.getElementById('safety').innerHTML=NS.D.spec.safety.map(function(t){return '<li>'+t+'</li>';}).join('');
+var kn={safety:'방화막',curtain:'막',set:'장치봉',light:'조명봉',shell:'음향반사판',screen:'영사막',draw:'끌막',cyc:'하늘막',info:'현수막'};
+document.getElementById('lines').innerHTML='<thead><tr><th>번호</th><th>명칭</th><th>종류</th><th>영점선 거리 (m)</th><th>비고</th></tr></thead><tbody>'+P.lines.map(function(l){var T3=P.tiers;var onTier=(l[3]==='light'||l[3]==='shell'||l[3]==='set')&&l[2]>=T3[0].y0&&l[2]<=T3[2].y1;var note=l[0]===3?'샤막 위치(안)':(l[3]==='light'&&onTier)?'단 위: 설치 전 작업 후 상승':(l[0]===12)?'1단 앞 경계(6.0m)':(l[0]===27||l[0]===28)?'백 화이트·블랙 선택':'';return '<tr><td>'+l[0]+'</td><td>'+l[1]+'</td><td>'+kn[l[3]]+'</td><td>'+l[2].toFixed(2)+'</td><td>'+note+'</td></tr>';}).join('')+'</tbody>';
+NS.tabs();
+</script></body></html>
