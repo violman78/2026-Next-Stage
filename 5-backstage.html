@@ -6,7 +6,7 @@
 </head><body>
 <div id="chrome"></div>
 <main class="wrap" id="app"><div id="head"></div>
-<div class="row2" style="margin-bottom:72px"><div class="card white"><span class="tag orange">10월 6일 반영</span><h3 style="margin-top:14px">국악기 배치</h3><p class="sub" style="margin-top:6px">첫 곡 「산조, 새로운 울림」만 무대 중앙에 배치합니다. 사회 ②가 진행되는 약 1분 동안 2단 우측(대금 · 피리 · 가야금 · 아쟁 자리)으로 이동합니다. 철거가 아니라 재배치입니다</p></div>
+<div class="row2" style="margin-bottom:72px"><div class="card white"><span class="tag orange">10월 6일 반영</span><h3 style="margin-top:14px">국악기 배치</h3><p class="sub" style="margin-top:6px">첫 곡 「산조, 새로운 울림」만 무대 중앙에 배치합니다. 챕터 1 영상과 사회 ①이 진행되는 동안 2단 우측(대금 · 피리 · 가야금 · 아쟁 자리)으로 이동합니다. 철거가 아니라 재배치입니다</p></div>
 <div class="card white"><span class="tag purple">풍물팀</span><h3 style="margin-top:14px">아름다운나라 앞 풍물 인트로</h3><p class="sub" style="margin-top:6px">풍물 4인이 SL 2 · SR 2 윙에서 진입해 약 4분 연주한 뒤 아름다운나라로 이어집니다. 당일 16시 전후 리허설이 가능합니다</p></div></div>
 <div class="row2" style="margin-bottom:56px"><div class="card white"><span class="tag blue">고정</span><h3 style="margin-top:12px">이동 없는 악기</h3><ul class="plain" id="fx" style="margin-top:12px"></ul></div><div class="card white"><span class="tag orange">등퇴장</span><h3 style="margin-top:12px">입퇴장하는 출연자</h3><ul class="plain" id="mv" style="margin-top:12px"></ul></div></div>
 <div class="sec-head"><h2>큐별 윙 입퇴장 일람</h2><p>중앙 통로는 사용하지 않고 SL과 SR 윙으로만 오갑니다</p></div>
@@ -17,6 +17,6 @@
 NS.chrome(5);
 document.getElementById('head').innerHTML=NS.head('무대 운영','백스테이지 입퇴장 동선','고정 악기와 등퇴장 출연자를 구분하고, 큐별 SL · SR 윙 입퇴장을 정리했습니다');
 document.getElementById('fx').innerHTML=NS.D.fixedList.map(function(r){return '<li>'+r[0]+': '+r[1]+'</li>';}).join('');document.getElementById('mv').innerHTML=NS.D.movingList.map(function(r){return '<li>'+r[0]+': '+r[1]+'</li>';}).join('');
-document.getElementById('wing').innerHTML='<thead><tr><th>큐</th><th>프로그램</th><th>등퇴장 출연자</th><th>윙</th><th>무대 · 동선</th></tr></thead><tbody>'+NS.D.cues.filter(function(c){return c.kind!=='video'&&c.kind!=='pre';}).map(function(c){return '<tr><td>'+c.code+'</td><td>'+c.title+'</td><td>'+NS.movingOf(c)+'</td><td>'+(c.wing||'')+'</td><td>'+c.stage+'</td></tr>';}).join('')+'</tbody>';
+document.getElementById('wing').innerHTML='<thead><tr><th>큐</th><th>프로그램</th><th>등퇴장 출연자</th><th>윙</th><th>무대 · 동선</th></tr></thead><tbody>'+NS.D.cues.filter(function(c){return c.kind!=='video'&&c.kind!=='pre'&&c.kind!=='scrim'&&c.kind!=='ann';}).map(function(c){return '<tr><td>'+c.code+'</td><td>'+c.title+'</td><td>'+NS.movingOf(c)+'</td><td>'+(c.wing||'')+'</td><td>'+c.stage+'</td></tr>';}).join('')+'</tbody>';
 NS.tabs();
 </script></body></html>

@@ -10,10 +10,13 @@
 <script src="assets/data.js"></script><script src="assets/app.js"></script><script src="assets/plan.js"></script>
 <script>
 NS.chrome(2);
-document.getElementById('head').innerHTML=NS.head('사회 진행','사회 진행 대본','사회는 프로그램표에 지정된 8개 지점에서만 진행하며, 곡 사이에 별도의 멘트를 추가하지 않습니다. 현재 대본은 확정 전 초안이며, 사회는 박한솔이 맡습니다');
-var MCL=['① 오프닝','② 산조 후','③ 3 · 4 · 5번','④ 6 · 7 · 8번','⑤ 중간 영상','⑥ 타악 협주','⑦ 피날레 안내','⑧ 클로징'];
+document.getElementById('head').innerHTML=NS.head('사회 진행','사회 진행 대본','사회는 10/7 확정 상세 큐시트의 6개 지점(챕터 1 후, The De’but 후, Valerie 후, 홀로 아리랑 후, 타악 협주 후, 14번 후 클로징)에서만 진행하며, 곡 사이에 별도의 멘트를 추가하지 않습니다. 현재 대본은 확정 전 초안이며, 사회는 박한솔이 맡습니다');
+var MCL=['① The De’but 소개','② 3 · 4 · 5번','③ 6 · 7 · 8번','④ 타악 협주','⑤ 12 · 13번','⑥ 클로징'];
 document.getElementById('list').innerHTML=NS.D.mcScripts.map(function(m){
  return '<article class="mc"><div><div class="code">'+m.cue+' · '+m.n+'번째 멘트</div><h3>'+m.title+'</h3><div class="cues"><span class="tag blue" style="width:fit-content">'+m.pos+'</span><div><b>시작</b>'+NS.esc(m.inCue)+'</div><div><b>마무리</b>'+NS.esc(m.outCue)+'</div></div></div><div class="script">'+m.paras.map(function(p){return '<p>'+p+'</p>';}).join('')+(m.note?'<div class="note">'+m.note+'</div>':'')+'</div></article>';}).join('');
 [].forEach.call(document.querySelectorAll('#list .mc'),function(a,k){a.classList.add('tabpane');a.setAttribute('data-tab',MCL[k]);});
+(function(){var R=NS.D.mcRemoved||[];if(!R.length)return;var d=document.createElement('div');d.className='tabpane';d.setAttribute('data-tab','빠진 멘트 (참고)');
+d.innerHTML='<div class="sec-head" style="margin-top:56px"><h2>10/7 순서 변경으로 빠진 멘트 (참고 보관)</h2><p>확정 상세 큐시트에서 삭제된 사회 지점의 대본입니다. 공연에서는 사용하지 않습니다</p></div>'+R.map(function(m){return '<article class="mc"><div><div class="code">'+m.cue+' · 삭제</div><h3>'+m.title+'</h3><div class="cues"><span class="tag orange" style="width:fit-content">'+NS.esc(m.removedReason)+'</span></div></div><div class="script">'+m.paras.map(function(p){return '<p>'+p+'</p>';}).join('')+'</div></article>';}).join('');
+document.getElementById('list').appendChild(d);})();
 NS.tabs();
 </script></body></html>
