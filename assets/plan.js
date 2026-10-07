@@ -4,31 +4,45 @@
 var NS=window.NS, D=NS.D;
 var FULLBACK=['band','drums','strings','gugak_back'];
 var ST={
+ 'S1':{present:[]},
  'P':{present:[]},
+ 'A1':{present:[]},
  'V1':{present:['gugak_center','band','drums','strings']},
- 'MC1':{present:['gugak_center','band','drums','strings']},
+ 'S2':{present:['gugak_center','band','drums','strings']},
  '1':{play:['gugak_center','band','drums'],present:['strings']},
- 'MC2':{present:FULLBACK,move:true},
+ 'V2':{present:FULLBACK,move:true},
+ 'MC1':{present:FULLBACK},
  '2':{play:['band','drums'],present:['strings','gugak_back']},
+ 'MC2':{present:FULLBACK},
  '3':{play:['vocal','chorus','band','drums','strings'],present:['gugak_back']},
  '4':{play:['vocal','band','drums','strings'],present:['gugak_back']},
  '5':{play:['vocal','chorus','band','drums','strings'],present:['gugak_back']},
+ 'MC3':{present:FULLBACK},
  '6':{play:['vocal','chorus','band','drums','strings'],present:['gugak_back']},
  '7':{play:['vocal','band','drums','strings'],present:['gugak_back']},
  '8':{play:['vocal','chorus','band','drums','strings'],present:['gugak_back']},
+ 'S3':{present:FULLBACK},
+ 'V3':{present:FULLBACK},
+ 'V4':{present:FULLBACK},
+ 'S4':{present:FULLBACK},
  '9':{play:['duo','chorus'].concat(FULLBACK)},
  '10':{play:['duo','chorus'].concat(FULLBACK)},
+ 'MC4':{present:FULLBACK},
  '11':{play:['perc','drums','band'],present:['strings','gugak_back']},
+ 'MC5':{present:FULLBACK},
  '12':{play:['ensemble'].concat(FULLBACK)},
  '13':{play:['ensemble'].concat(FULLBACK)},
- '14':{play:['ensemble','pungmul'].concat(FULLBACK)}
+ 'V5':{present:['ensemble'].concat(FULLBACK)},
+ '14':{play:['ensemble','pungmul'].concat(FULLBACK)},
+ 'MC6':{present:['ensemble','pungmul'].concat(FULLBACK)},
+ 'V6':{present:['ensemble','pungmul'].concat(FULLBACK)}
 };
 function stateOf(c,g,master){
  if(master)return 'play';
  var s=ST[c.code]||{present:FULLBACK};
  if((s.play||[]).indexOf(g)>=0)return 'play';
  if((s.present||[]).indexOf(g)>=0)return 'present';
- if(c.kind==='mc'||c.kind==='video'){ if(FULLBACK.indexOf(g)>=0)return 'present'; }
+ if(c.kind==='mc'||c.kind==='video'||c.kind==='scrim'){ if(FULLBACK.indexOf(g)>=0)return 'present'; }
  return 'none';
 }
 var SC=40, OX=404, OY=624;
@@ -180,26 +194,27 @@ NS.movingOf=function(c){
 
 
 /* 공연 런다운 보드: 전체 흐름과 진행 위치를 한 장으로 */
-var SHORT={'P':['입장','하우스 오픈',''],'V1':['오프닝 영상','',''],'MC1':['사회 ①','오프닝',''],'MC2':['사회 ②','The De’but 소개',''],'MC3':['사회 ③','3 · 4 · 5번 소개',''],'MC4':['사회 ④','6 · 7 · 8번 소개',''],'MC5':['사회 ⑤','중간 영상 소개',''],'V2':['중간 영상','',''],'MC6':['사회 ⑥','타악 협주곡 소개',''],'MC7':['사회 ⑦','12 · 13번 안내',''],'V3':['파이널 영상','',''],'MC8':['사회 ⑧','클로징',''],
+var SHORT={'S1':['샤막 IN','하강 8~10초',''],'P':['대기영상','하우스 오픈',''],'A1':['본종 안내멘트','',''],'V1':['오프닝 영상','',''],'S2':['샤막 OUT','상승 8~10초',''],'V2':['영상 챕터 1','',''],'MC1':['사회 ①','The De’but 소개',''],'MC2':['사회 ②','3 · 4 · 5번 소개',''],'MC3':['사회 ③','6 · 7 · 8번 소개',''],'S3':['샤막 IN','하강 8~10초',''],'V3':['축전영상','',''],'V4':['영상 챕터 2','',''],'S4':['샤막 OUT','상승 8~10초',''],'MC4':['사회 ④','타악 협주곡 소개',''],'MC5':['사회 ⑤','12 · 13번 소개',''],'V5':['영상 챕터 3','',''],'MC6':['사회 ⑥','클로징',''],'V6':['엔딩크레딧','영상',''],
 '1':['산조, 새로운 울림','국악 5인 중앙','국악 마이킹'],'2':['The De’but','밴드',''],'3':['태양물고기','신한비','무선1 · 코러스3'],'4':['첫 눈처럼 너에게 가겠다','박민규','무선1 · 코러스3'],'5':['Valerie','임지륜','스탠드1 · 코러스4'],'6':['첫인상','김가희','무선1 · 코러스3'],'7':['I Fall In Love Too Easily','주권기','스탠드1'],'8':['이 밤이 지나면','강산','무선1 · 코러스4'],'9':['신사랑가','박설온 · 김영수','무선2 · 코러스2'],'10':['홀로 아리랑','김가희 · 신한비','무선2 · 코러스2'],'11':['타악기 협주곡','모둠북 · 드럼',''],'12':['네모의 꿈','앙상블 14명','구성 확인'],'13':['I Want You Back','앙상블 14명',''],'14':['풍물 · 아름다운나라','풍물 · 앙상블 14명','']};
 function wrapT(t,max){var w=t.split(' '),lines=[],cur='',cw=0;function ew(s){var n=0;for(var i=0;i<s.length;i++)n+=/[\u3131-\uD79D]/.test(s[i])?16:8.5;return n;}
  w.forEach(function(x){var xw=ew(x)+(cur?4:0);if(cur&&cw+xw>max){lines.push(cur);cur=x;cw=ew(x);}else{cur=cur?cur+' '+x:x;cw+=xw;}});if(cur)lines.push(cur);return lines.slice(0,3);}
-var KCOL={song:'#1d1d1f',mc:'#0071e3',video:'#8944ab',pre:'#8e8e93'};
+var KCOL={song:'#1d1d1f',mc:'#0071e3',video:'#8944ab',pre:'#8e8e93',scrim:'#c93400',ann:'#248a3d'};
+function CH(c,n){return !!(c.direct||((c.kind==='video'||c.kind==='scrim')&&n&&(n.kind==='song'||n.kind==='scrim'||n.kind==='video')));}
 NS.rundownSvg=function(o){
- o=o||{};var C=D.cues,idx=(o.idx===undefined?-1:o.idx),W=1250,cw=134,ch=142,gap=14,x0=25;
- var rows=[[0,7,'오프닝 · 산조 · 밴드'],[7,15,'보컬 3곡 연속 두 구간'],[15,21,'중간 영상 · 듀엣 · 타악 협주'],[21,26,'피날레']];
+ o=o||{};var C=D.cues,idx=(o.idx===undefined?-1:o.idx),W=1250,cw=120,ch=142,gap=14,x0=25;
+ var rows=[[0,8,'입장 · 오프닝 영상 · 산조 · 챕터 1'],[8,17,'The De’but · 보컬 6곡'],[17,25,'샤막 · 축전영상 · 챕터 2 · 듀엣 · 타악'],[25,32,'앙상블 · 챕터 3 · 풍물 · 클로징']];
  var songs=C.filter(function(c){return c.kind==='song';}),doneSongs=songs.filter(function(c){return C.indexOf(c)<idx;}).length;
  var H=96+4*(ch+52)+40,s='<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 '+W+' '+H+'" font-family="Pretendard Variable,Pretendard,Apple SD Gothic Neo,sans-serif" role="img" aria-label="공연 런다운">';
  s+='<rect width="'+W+'" height="'+H+'" fill="#fff"/>';
- s+='<text x="25" y="38" font-size="22" font-weight="700" fill="#1d1d1f">NEXT STAGE 공연 런다운</text><text x="25" y="60" font-size="13" fill="#6e6e73">2026.10.07 19:30 · 빛고을시민문화관 · 인터미션 없이 논스톱 · 곡 14 · 사회 8 · 영상 3</text>';
+ s+='<text x="25" y="38" font-size="22" font-weight="700" fill="#1d1d1f">NEXT STAGE 공연 런다운</text><text x="25" y="60" font-size="13" fill="#6e6e73">2026.10.07 19:30 · 빛고을시민문화관 · 인터미션 없이 논스톱 · 곡 14 · 사회 6 · 영상 7 · 샤막 4</text>';
  if(idx>=0){var pct=(idx+1)/C.length;s+='<text x="'+(W-25)+'" y="38" font-size="15" font-weight="700" fill="#1d1d1f" text-anchor="end">곡 '+doneSongs+' / 14 완료 · 큐 '+(idx+1)+' / '+C.length+'</text><rect x="'+(W-325)+'" y="48" width="300" height="8" rx="4" fill="#e5e5ea"/><rect x="'+(W-325)+'" y="48" width="'+(300*pct)+'" height="8" rx="4" fill="#248a3d"/>';}
  rows.forEach(function(r,ri){
   var y0=96+ri*(ch+52);
   s+='<text x="25" y="'+(y0-12)+'" font-size="15" font-weight="700" fill="#6e6e73">'+String.fromCharCode(65+ri)+'  ·  '+r[2]+'</text>';
   // 무지연 연결 구간 표시
   var i=r[0];
-  while(i<r[1]){var c=C[i],nxt=C[i+1],chain=(c.direct||(c.kind==='video'&&nxt&&nxt.kind==='song'));
-   if(chain&&i+1<r[1]+0){var j=i;while(j+1<r[1]&&(C[j].direct||(C[j].kind==='video'&&C[j+1]&&C[j+1].kind==='song')))j++;
+  while(i<r[1]){var c=C[i],nxt=C[i+1],chain=CH(c,nxt);
+   if(chain&&i+1<r[1]+0){var j=i;while(j+1<r[1]&&CH(C[j],C[j+1]))j++;
     var xa=x0+(i-r[0])*(cw+gap),xb=x0+(j-r[0])*(cw+gap)+cw;
     s+='<rect x="'+(xa-4)+'" y="'+(y0-4)+'" width="'+(xb-xa+8)+'" height="'+(ch+8+26)+'" rx="14" fill="none" stroke="#d70015" stroke-width="1.6" stroke-dasharray="5 4"/><text x="'+((xa+xb)/2)+'" y="'+(y0+ch+24)+'" font-size="12" font-weight="700" fill="#d70015" text-anchor="middle">무지연 연결</text>';
     i=j+1;}else i++;}
@@ -208,7 +223,7 @@ NS.rundownSvg=function(o){
    s+='<g data-i="'+k+'" style="cursor:pointer">';
    s+='<rect x="'+x+'" y="'+y0+'" width="'+cw+'" height="'+ch+'" rx="14" fill="'+(done?'#f5f5f7':'#fff')+'" stroke="'+(cur?'#0071e3':'#d2d2d7')+'" stroke-width="'+(cur?3.5:1.2)+'"/>';
    s+='<path d="M'+(x+14)+' '+y0+'h'+(cw-28)+'a14 14 0 0 1 14 14v0h-'+cw+'v0a14 14 0 0 1 14 -14z" fill="'+col+'" opacity="'+(done?.35:1)+'"/>';
-   var lab=c.kind==='song'?'곡 '+c.code:c.kind==='mc'?'사회':c.kind==='video'?'영상':'입장';
+   var lab=c.kind==='song'?'곡 '+c.code:c.kind==='mc'?'사회':c.kind==='video'?'영상':c.kind==='scrim'?'샤막':c.kind==='ann'?'안내':'입장';
    s+='<text x="'+(x+14)+'" y="'+(y0+12)+'" font-size="11.5" font-weight="700" fill="#fff" opacity="'+(done?.8:1)+'">'+lab+'</text>';
    if(c.scrim==='down')s+='<text x="'+(x+cw-12)+'" y="'+(y0+12)+'" font-size="11" font-weight="700" fill="#fff" text-anchor="end">샤막↓</text>';
    var tl=wrapT(sh[0],cw-24);
@@ -222,7 +237,7 @@ NS.rundownSvg=function(o){
    s+='</g>';
   }
  });
- var ly=H-22,lx=25;[['곡','#1d1d1f'],['사회','#0071e3'],['영상','#8944ab'],['입장','#8e8e93']].forEach(function(l){s+='<rect x="'+lx+'" y="'+(ly-10)+'" width="14" height="14" rx="4" fill="'+l[1]+'"/><text x="'+(lx+20)+'" y="'+(ly+2)+'" font-size="12" fill="#6e6e73">'+l[0]+'</text>';lx+=70;});
+ var ly=H-22,lx=25;[['곡','#1d1d1f'],['사회','#0071e3'],['영상','#8944ab'],['샤막','#c93400'],['안내','#248a3d'],['입장','#8e8e93']].forEach(function(l){s+='<rect x="'+lx+'" y="'+(ly-10)+'" width="14" height="14" rx="4" fill="'+l[1]+'"/><text x="'+(lx+20)+'" y="'+(ly+2)+'" font-size="12" fill="#6e6e73">'+l[0]+'</text>';lx+=70;});
  s+='<rect x="'+lx+'" y="'+(ly-10)+'" width="22" height="14" rx="5" fill="none" stroke="#d70015" stroke-dasharray="4 3"/><text x="'+(lx+28)+'" y="'+(ly+2)+'" font-size="12" fill="#6e6e73">무지연 연결 (사회 없이 이어짐)</text>';
  s+='<text x="'+(W-25)+'" y="'+(ly+2)+'" font-size="12" fill="#6e6e73" text-anchor="end">샤막↓ = 샤막을 내려 영상 영사 · 막이 올라가면 풀 무대</text>';
  return s+'</svg>';

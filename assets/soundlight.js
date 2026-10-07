@@ -1,7 +1,7 @@
 /* NEXT STAGE 음향 · 조명 콘티 (큐별 매트릭스, 조명 색 콘티, 호출 체인, 장비 요약) */
 (function(){
 var NS=window.NS,D=NS.D,C=D.cues,ST=NS.ST,CT=NS.conti,N=C.length;
-var LC={'P':['#f5deb3'],'V1':['#111111'],'MC1':['#fff3d6'],'1':['#f6c343','#e08a00'],'MC2':['#fff3d6'],'2':['#2f6bff','#8a4bff'],'MC3':['#fff3d6'],'3':['#ff9f1c','#ff6a00'],'4':['#eaf4ff','#9ecbff'],'5':['#ff5fa2','#ffd23f'],'MC4':['#fff3d6'],'6':['#ff2fd1','#00d5ff'],'7':['#0a2a8a','#ffffff'],'8':['#ff4d4d','#3fa9ff','#ffd23f'],'MC5':['#fff3d6','#111111'],'V2':['#111111'],'9':['#d62828','#f5c542'],'10':['#1f4fd1','#ffffff'],'MC6':['#fff3d6'],'11':['#e01f1f','#ffffff'],'MC7':['#fff3d6'],'12':['#ffc8dd','#bde0fe','#caffbf'],'13':['#ffd23f','#ff2fd1'],'V3':['#111111'],'14':['#ffe9a8','#ffffff'],'MC8':['#ffffff','#ffe9a8']};
+var LC={'S1':['#f5deb3'],'P':['#f5deb3'],'A1':['#111111'],'V1':['#111111'],'S2':['#111111','#f6c343'],'1':['#f6c343','#e08a00'],'V2':['#111111'],'MC1':['#fff3d6'],'2':['#2f6bff','#8a4bff'],'MC2':['#fff3d6'],'3':['#ff9f1c','#ff6a00'],'4':['#eaf4ff','#9ecbff'],'5':['#ff5fa2','#ffd23f'],'MC3':['#fff3d6'],'6':['#ff2fd1','#00d5ff'],'7':['#0a2a8a','#ffffff'],'8':['#ff4d4d','#3fa9ff','#ffd23f'],'S3':['#fff3d6','#111111'],'V3':['#111111'],'V4':['#111111'],'S4':['#111111','#d62828'],'9':['#d62828','#f5c542'],'10':['#1f4fd1','#ffffff'],'MC4':['#fff3d6'],'11':['#e01f1f','#ffffff'],'MC5':['#fff3d6'],'12':['#ffc8dd','#bde0fe','#caffbf'],'13':['#ffd23f','#ff2fd1'],'V5':['#111111'],'14':['#ffe9a8','#ffffff'],'MC6':['#ffffff','#ffe9a8'],'V6':['#ffe9a8','#ffffff']};
 function grad(a){return a.length===1?a[0]:'linear-gradient(90deg,'+a.join(',')+')';}
 function pl(c,g){var s=ST[c.code];return s&&s.play&&s.play.indexOf(g)>=0;}
 function pr(c,g){var s=ST[c.code];return s&&s.present&&s.present.indexOf(g)>=0;}
@@ -21,14 +21,14 @@ var ROWS=[
  ['모둠북 · 타악',function(c){return pl(c,'perc')?['on','']:null;}],
  ['스트링 10인',function(c){return pl(c,'strings')?['on','']:(pr(c,'strings')?['off','']:null);}],
  ['영상 음원 L/R',function(c){return c.kind==='video'?['on','']:null;}],
- ['하우스 BGM · 안내방송',function(c){return c.kind==='pre'?['on','']:null;}]
+ ['하우스 BGM · 안내방송',function(c){return (c.kind==='pre'||c.kind==='ann')?['on','']:null;}]
 ];
 NS.sl={};var SL=NS.sl;
 SL.matrix=function(){
- var W=1250,lx=230,cw=38,ch=32,top=110,H=top+ROWS.length*(ch+4)+90;
+ var W=1250,lx=230,cw=31,ch=32,top=110,H=top+ROWS.length*(ch+4)+90;
  var o='<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 '+W+' '+H+'" font-family="Pretendard Variable,Pretendard,Apple SD Gothic Neo,sans-serif" role="img"><rect width="'+W+'" height="'+H+'" fill="#fff"/>';
  o+='<text x="24" y="32" font-size="20" font-weight="700" fill="#1d1d1f">음향 마이크 · 음원 매트릭스 (MIC PLOT)</text><text x="24" y="54" font-size="12.5" fill="#6e6e73">가로: 공연 큐 순서 · 세로: 입력 소스. 검정 원은 사용, 빈 원은 대기(자리에 있으나 연주하지 않음), 주황 ?는 구성 확인 필요입니다. 원 안 숫자는 수량 또는 인원</text>';
- var TC={song:'#1d1d1f',mc:'#0071e3',video:'#8944ab',pre:'#8e8e93'};
+ var TC={song:'#1d1d1f',mc:'#0071e3',video:'#8944ab',pre:'#8e8e93',scrim:'#c93400',ann:'#248a3d'};
  C.forEach(function(c,i){var x=lx+i*cw;o+='<rect x="'+x+'" y="'+(top-32)+'" width="'+(cw-3)+'" height="24" rx="5" fill="'+TC[c.kind]+'"/><text x="'+(x+(cw-3)/2)+'" y="'+(top-15)+'" font-size="'+(c.code.length>2?9:11)+'" font-weight="700" fill="#fff" text-anchor="middle">'+(c.kind==='mc'?'사'+c.mc:c.code)+'</text>';});
  ROWS.forEach(function(r,k){var y=top+k*(ch+4);o+=(k%2?'<rect x="24" y="'+y+'" width="'+(lx+N*cw-24)+'" height="'+ch+'" fill="#fafafc"/>':'')+'<text x="'+(lx-12)+'" y="'+(y+ch/2+4)+'" font-size="13" font-weight="700" fill="#1d1d1f" text-anchor="end">'+r[0]+'</text>';
   C.forEach(function(c,i){var v=r[1](c);if(!v)return;var cx=lx+i*cw+(cw-3)/2,cy=y+ch/2;
@@ -43,13 +43,13 @@ SL.matrix=function(){
 };
 /* 조명 콘티 카드 */
 SL.lightCards=function(){
- return C.map(function(c,i){var cols=LC[c.code]||['#eee'];var dark=(c.kind==='video'||c.code==='V1');
-  var tag=c.kind==='song'?'곡 '+c.code:(c.kind==='mc'?'사회 '+c.mc:(c.kind==='video'?'영상 '+c.code:'입장'));
+ return C.map(function(c,i){var cols=LC[c.code]||['#eee'];var dark=(c.kind==='video'||c.code==='V1'||c.code==='A1');
+  var tag=c.kind==='song'?'곡 '+c.code:(c.kind==='mc'?'사회 '+c.mc:(c.kind==='video'?'영상 '+c.code:(c.kind==='scrim'?'샤막 '+c.code:(c.kind==='ann'?'안내 '+c.code:'입장'))));
   return '<article class="lcard"><div class="lsw" style="background:'+grad(cols)+'"><span class="ck" style="'+(dark?'color:#fff':'')+'">'+tag+'</span>'+(c.scrim==='down'?'<span class="lsc">샤막↓ 전면 차단</span>':'')+'</div><div class="lb"><b>'+c.title+'</b><p class="lt">'+c.light+'</p><p class="ls">영상 · '+c.visual+'</p><p class="lc">호출 · '+c.call+'</p></div></article>';}).join('');
 };
 /* 조명 컬러 스트립(한 장 요약) */
 SL.strip=function(){
- var W=1250,cw=46,H=170,lx=24;
+ var W=1250,cw=37,H=170,lx=24;
  var o='<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 '+W+' '+H+'" font-family="Pretendard Variable,Pretendard,Apple SD Gothic Neo,sans-serif" role="img"><rect width="'+W+'" height="'+H+'" fill="#fff"/>';
  o+='<text x="24" y="30" font-size="18" font-weight="700" fill="#1d1d1f">조명 색 흐름 (LIGHT CONCEPT STRIP)</text>';
  C.forEach(function(c,i){var x=lx+i*cw,cols=LC[c.code]||['#eee'],id='lg'+i;

@@ -189,7 +189,7 @@ ul.plain li{display:flex;gap:10px}ul.plain li::before{content:"";width:5px;heigh
 .cframe{background:#fff;border:1.5px solid var(--ink);border-radius:var(--r-sm);overflow:hidden;break-inside:avoid;display:flex;flex-direction:column}
 .cframe header{display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding:10px 14px;background:var(--surface);border-bottom:1.5px solid var(--ink)}
 .cframe header .ck{font-size:12.5px;font-weight:800;padding:3px 10px;border-radius:980px;color:#fff;background:var(--ink)}
-.cframe.k-mc header .ck{background:var(--blue)}.cframe.k-video header .ck{background:var(--purple)}.cframe.k-pre header .ck{background:#8e8e93}
+.cframe.k-mc header .ck{background:var(--blue)}.cframe.k-video header .ck{background:var(--purple)}.cframe.k-pre header .ck{background:#8e8e93}.cframe.k-scrim header .ck{background:#c93400}.cframe.k-ann header .ck{background:#248a3d}
 .cframe header b{font-size:16px;letter-spacing:-.02em;flex:1;min-width:0}
 .cframe .csvg{padding:6px;background:#fff}.cframe .csvg svg{display:block;width:100%;height:auto}
 .cframe dl{padding:4px 14px 12px;display:grid;gap:6px}

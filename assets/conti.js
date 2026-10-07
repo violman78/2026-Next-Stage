@@ -3,28 +3,28 @@
    상태 코드: . 무대 밖  L SL 윙 대기  R SR 윙 대기  W 양쪽 윙 대기  S 무대 위  M 무대 위에서 이동  U 미확정(자료 비어 있음) */
 (function(){
 var NS=window.NS,D=NS.D,C=D.cues,ST=NS.ST;
-var N=C.length; // 26
+var N=C.length; // 32 (10/7 확정 상세 큐시트)
 var IDX={};C.forEach(function(c,i){IDX[c.code]=i;});
 function row(def){var a=[];for(var i=0;i<N;i++)a.push('.');for(var k in def){a[+k]=def[k];}return a.join('');}
 function rng(ch,from,to){var d={};for(var i=from;i<=to;i++)d[i]=ch;return d;}
 function mrg(){var o={};for(var i=0;i<arguments.length;i++)for(var k in arguments[i])o[k]=arguments[i][k];return o;}
 var SWIM=[
- {n:'사회자',g:'mc',c:'#0071e3',cells:row({1:'R',2:'S',3:'R',4:'S',5:'L',6:'S',9:'R',10:'S',13:'R',14:'S',17:'R',18:'S',19:'L',20:'S',24:'R',25:'S'})},
- {n:'국악기 5인',g:'gu',c:'#c93400',cells:row(mrg(rng('S',1,3),{4:'M'},rng('S',5,25)))},
- {n:'밴드 · 드럼 · 스트링 · 타악',g:'fx',c:'#8e8e93',cells:row(rng('S',1,25)),fixed:true},
- {n:'신한비',g:'vo',c:'#1d1d1f',cells:row({5:'L',6:'L',7:'S',16:'L',17:'S'})},
- {n:'박민규',g:'vo',c:'#1d1d1f',cells:row({7:'L',8:'S'})},
- {n:'임지륜',g:'vo',c:'#1d1d1f',cells:row({8:'R',9:'S'})},
- {n:'김가희',g:'vo',c:'#1d1d1f',cells:row({10:'L',11:'S',16:'L',17:'S'})},
- {n:'주권기',g:'vo',c:'#1d1d1f',cells:row({11:'L',12:'S'})},
- {n:'강산',g:'vo',c:'#1d1d1f',cells:row({12:'R',13:'S'})},
- {n:'박설온',g:'vo',c:'#1d1d1f',cells:row({14:'L',15:'L',16:'S'})},
- {n:'김영수',g:'vo',c:'#1d1d1f',cells:row({14:'R',15:'R',16:'S'})},
- {n:'코러스 2~4명',g:'ch',c:'#6e6e73',cells:row({7:'S',8:'S',9:'S',11:'S',13:'S',16:'S',17:'S'}),note:'2단 좌측 4석 · 입퇴장 확인'},
- {n:'보컬 앙상블 14명',g:'en',c:'#1d1d1f',cells:row({20:'W',21:'S',22:'S',23:'W',24:'S',25:'S'})},
- {n:'풍물 4인',g:'pm',c:'#8944ab',cells:row({23:'W',24:'S',25:'S'})}
+ {n:'사회자',g:'mc',c:'#0071e3',cells:row({6:'R',7:'S',8:'L',9:'S',12:'R',13:'S',22:'R',23:'S',24:'L',25:'S',29:'R',30:'S'})},
+ {n:'국악기 5인',g:'gu',c:'#c93400',cells:row(mrg(rng('S',3,5),{6:'M'},rng('S',7,31)))},
+ {n:'밴드 · 드럼 · 스트링 · 타악',g:'fx',c:'#8e8e93',cells:row(rng('S',3,31)),fixed:true},
+ {n:'신한비',g:'vo',c:'#1d1d1f',cells:row({8:'L',9:'L',10:'S',21:'L',22:'S'})},
+ {n:'박민규',g:'vo',c:'#1d1d1f',cells:row({10:'L',11:'S'})},
+ {n:'임지륜',g:'vo',c:'#1d1d1f',cells:row({11:'R',12:'S'})},
+ {n:'김가희',g:'vo',c:'#1d1d1f',cells:row({13:'L',14:'S',21:'L',22:'S'})},
+ {n:'주권기',g:'vo',c:'#1d1d1f',cells:row({14:'L',15:'S'})},
+ {n:'강산',g:'vo',c:'#1d1d1f',cells:row({15:'R',16:'S'})},
+ {n:'박설온',g:'vo',c:'#1d1d1f',cells:row({17:'L',18:'L',19:'L',20:'L',21:'S'})},
+ {n:'김영수',g:'vo',c:'#1d1d1f',cells:row({17:'R',18:'R',19:'R',20:'R',21:'S'})},
+ {n:'코러스 2~4명',g:'ch',c:'#6e6e73',cells:row({10:'S',11:'S',12:'S',14:'S',16:'S',21:'S',22:'S'}),note:'2단 좌측 4석 · 입퇴장 확인'},
+ {n:'보컬 앙상블 14명',g:'en',c:'#1d1d1f',cells:row({25:'W',26:'S',27:'S',28:'W',29:'S',30:'S',31:'S'})},
+ {n:'풍물 4인',g:'pm',c:'#8944ab',cells:row({28:'W',29:'S',30:'S',31:'S'})}
 ];
-var EXITS={'신한비':{7:'SR',17:'SL'},'박민규':{8:'SL'},'임지륜':{9:'SR'},'김가희':{11:'SR',17:'SL'},'주권기':{12:'SL'},'강산':{13:'윙'},'박설온':{16:'윙'},'김영수':{16:'SR'},'보컬 앙상블 14명':{22:'SL·SR'},'사회자':{}};
+var EXITS={'신한비':{10:'SR',22:'SL'},'박민규':{11:'SL'},'임지륜':{12:'SR'},'김가희':{14:'SR',22:'SL'},'주권기':{15:'SL'},'강산':{16:'윙'},'박설온':{21:'윙'},'김영수':{21:'SR'},'보컬 앙상블 14명':{27:'SL·SR'},'사회자':{}};
 SWIM.forEach(function(p){if(p.cells.length!==N)throw new Error('SWIM 길이 오류: '+p.n+' '+p.cells.length);});
 var SIDE={L:'SL',R:'SR',W:'SL·SR'};
 function st(p,i){return (i<0||i>=N)?'.':p.cells[i];}
@@ -40,16 +40,16 @@ function moves(i){var inn=[],out=[],wt=[],on=[];
  return {in:inn,out:out,wait:wt,on:on};}
 /* ---------- 출연자 동선 타임라인 ---------- */
 NS.conti={};var CT=NS.conti;
-var TCOL={song:'#1d1d1f',mc:'#0071e3',video:'#8944ab',pre:'#8e8e93'};
+var TCOL={song:'#1d1d1f',mc:'#0071e3',video:'#8944ab',pre:'#8e8e93',scrim:'#c93400',ann:'#248a3d'};
 CT.timeline=function(){
- var W=1250,lx=190,cw=39,ch=34,top=96,H=top+SWIM.length*(ch+6)+110;
+ var W=1250,lx=190,cw=33,ch=34,top=96,H=top+SWIM.length*(ch+6)+110;
  var o='<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 '+W+' '+H+'" font-family="Pretendard Variable,Pretendard,Apple SD Gothic Neo,sans-serif" role="img"><rect width="'+W+'" height="'+H+'" fill="#fff"/>';
  o+='<text x="24" y="32" font-size="20" font-weight="700" fill="#1d1d1f">출연자 입퇴장 타임라인 (SWIMLANE)</text><text x="24" y="54" font-size="12.5" fill="#6e6e73">가로: 공연 큐 순서 · 세로: 출연자. 검정 막대는 무대 위, 회색은 윙 대기(SL · SR), 초록 화살표는 입장, 붉은 화살표는 퇴장입니다</text>';
  // 헤더
  C.forEach(function(c,i){var x=lx+i*cw,col=TCOL[c.kind]||'#999';
-  o+='<rect x="'+x+'" y="'+(top-30)+'" width="'+(cw-3)+'" height="24" rx="5" fill="'+col+'"/><text x="'+(x+(cw-3)/2)+'" y="'+(top-13)+'" font-size="'+(c.code.length>2?9:11)+'" font-weight="700" fill="#fff" text-anchor="middle">'+(c.kind==='mc'?'사'+c.mc:c.kind==='video'?c.code:c.code)+'</text>';});
+  o+='<rect x="'+x+'" y="'+(top-30)+'" width="'+(cw-3)+'" height="24" rx="5" fill="'+col+'"/><text x="'+(x+(cw-3)/2)+'" y="'+(top-13)+'" font-size="'+(c.code.length>2?9:11)+'" font-weight="700" fill="#fff" text-anchor="middle">'+(c.kind==='mc'?'사'+c.mc:c.code)+'</text>';});
  // 무지연 구간 표시
- var chains=[[7,9],[11,13],[15,17],[21,22],[23,24]];
+ var chains=[[3,5],[10,12],[14,16],[17,22],[26,27],[28,29]];
  chains.forEach(function(r){var x=lx+r[0]*cw-2,w=(r[1]-r[0]+1)*cw+1;o+='<rect x="'+x+'" y="'+(top-34)+'" width="'+w+'" height="'+(SWIM.length*(ch+6)+40)+'" rx="10" fill="none" stroke="#d70015" stroke-width="1.4" stroke-dasharray="5 4"/>';});
  SWIM.forEach(function(p,r){var y=top+r*(ch+6);
   o+='<text x="'+(lx-12)+'" y="'+(y+ch/2+4)+'" font-size="13" font-weight="700" fill="#1d1d1f" text-anchor="end">'+p.n+'</text>';
@@ -96,20 +96,21 @@ CT.frame=function(i){
 };
 CT.cardHtml=function(i){
  var c=C[i],m=moves(i);function nm(a){return a.map(function(e){return e.n+(e.side?' ('+e.side+')':'');}).join(' · ');}
- var kind=c.kind==='song'?'곡 '+c.code:(c.kind==='mc'?'사회 '+c.mc:(c.kind==='video'?'영상 '+c.code:'입장'));
+ var kind=c.kind==='song'?'곡 '+c.code:(c.kind==='mc'?'사회 '+c.mc:(c.kind==='video'?'영상 '+c.code:(c.kind==='scrim'?'샤막 '+c.code:(c.kind==='ann'?'안내 '+c.code:'입장'))));
  var wl=m.wait.length?m.wait.map(function(w){return w.n+' ('+w.side+')';}).join(' · '):'';
  var L=[];
  if(c.kind==='video'&&c.code==='V1')L.push(['입장','밴드 · 드럼 · 스트링 · 국악기 5인이 어둠 속에서 SL · SR 윙으로 입장해 착석']);
  if(m.in.length)L.push(['입장',nm(m.in)]);
  if(m.out.length)L.push(['퇴장',m.out.map(function(e){return e.n+' (→'+e.side+')';}).join(' · ')]);
  if(wl)L.push(['윙 대기',wl]);
- if(c.code==='MC2')L.push(['이동','국악기 5인 중앙 → 2단 우측 4인 (모둠북은 3단) · 돗자리 회수 확인']);
+ if(c.code==='V2')L.push(['이동','국악기 5인 중앙 → 2단 우측 4인 (모둠북은 3단) · 돗자리 회수 확인']);
+ if(c.kind==='scrim')L.push(['샤막',c.stage||'']);
  if(!L.length)L.push(['무대','입퇴장 없음 (고정 악기 연주)']);
  var mk=c.mics.length?c.mics.join(' · '):'—';
- var cls=['song','mc','video','pre'].indexOf(c.kind);
+ 
  return '<article class="cframe k-'+c.kind+'"><header><span class="ck">'+kind+'</span><b>'+c.title+'</b>'+(c.direct?'<span class="tag red">무지연</span>':'')+(c.scrim==='down'?'<span class="tag purple">샤막↓</span>':'')+'</header><div class="csvg">'+CT.frame(i)+'</div><dl>'+L.map(function(r){return '<div><dt>'+r[0]+'</dt><dd>'+r[1]+'</dd></div>';}).join('')+'<div class="aux"><dt>음향</dt><dd>'+mk+'</dd></div><div class="aux"><dt>조명</dt><dd>'+c.light+'</dd></div><div class="aux"><dt>호출</dt><dd>'+c.call+'</dd></div></dl></article>';
 };
-CT.groups=[['A · 오프닝 · 산조 · 밴드',0,6],['B · 보컬 3곡 연속 두 구간',7,14],['C · 중간 영상 · 듀엣 · 타악 협주',15,20],['D · 피날레',21,25]];
+CT.groups=[['A · 입장 · 오프닝 · 산조',0,6],['B · 사회 · 밴드 · 보컬 6곡',7,16],['C · 샤막 · 축전 · 듀엣 · 타악',17,25],['D · 앙상블 · 풍물 · 클로징',26,31]];
 /* ---------- 윙 동선표 ---------- */
 CT.wingTable=function(){
  var h='<thead><tr><th>큐</th><th>SL 윙 대기</th><th>무대 위 (이동 출연자)</th><th>SR 윙 대기</th><th>입장</th><th>퇴장</th></tr></thead><tbody>';
