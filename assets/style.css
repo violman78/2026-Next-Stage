@@ -97,6 +97,7 @@ table.t th{background:var(--surface);text-align:left;font-size:14px;color:var(--
 table.t td{padding:16px 18px;border-top:1px solid var(--line);vertical-align:top;color:var(--body)}
 table.t td:first-child{color:var(--ink);font-weight:600;white-space:nowrap}
 table.t tr.cur td{background:#f0f7ff}
+table.t.ql{min-width:1500px;font-size:13px}table.t.ql td{vertical-align:top;line-height:1.45}table.t.ql .no{font-weight:800;text-align:center;font-size:15px;color:var(--ink)}table.t.ql .sub{color:var(--mute);font-size:12px;margin-top:2px}table.t.ql .kt{display:inline-block;padding:1px 9px;border-radius:99px;font-size:12px;font-weight:700;color:#fff;white-space:nowrap}table.t.ql .bd{font-style:normal;font-size:11px;border-radius:99px;padding:0 7px;border:1px solid;margin-left:4px;white-space:nowrap}table.t.ql .bd.g{color:#248a3d}table.t.ql .bd.r{color:#c0392b}table.t.ql .sd{color:#8944ab}table.t.ql .su{color:#0071e3}table.t.ql .c{text-align:center;white-space:nowrap}table.t.ql .cl{font-size:12px}table.t.ql .rv{font-size:12px;color:var(--mute)}table.t.ql b{color:var(--ink)}
 .tablewrap{overflow-x:auto;border-radius:var(--r-md)}
 ul.plain{list-style:none;display:grid;gap:12px;font-size:16px;color:var(--body)}
 ul.plain li{display:flex;gap:10px}ul.plain li::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--mute);margin-top:10px;flex:none}
