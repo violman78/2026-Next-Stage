@@ -40,11 +40,18 @@ function C(x,y,r,o){o=o||{};return '<circle cx="'+X(x)+'" cy="'+Y(y)+'" r="'+(r*
 function L(x1,y1,x2,y2,o){o=o||{};return '<line x1="'+X(x1)+'" y1="'+Y(y1)+'" x2="'+X(x2)+'" y2="'+Y(y2)+'" stroke="'+(o.c||'#999')+'" stroke-width="'+(o.w||1)+'"'+(o.d?' stroke-dasharray="'+o.d+'"':'')+(o.op?' opacity="'+o.op+'"':'')+'/>';}
 var KC={safety:'#999',curtain:'#7b6fd6',set:'#c9c9ce',light:'#e08a00',shell:'#6aa3d9',screen:'#bbb',draw:'#7b6fd6',cyc:'#333',info:'#ccc'};
 
+/* 덧마루 30×3 내모임형 지오메트리: 중앙부 직선 + 좌우 날개(전면 내측 모서리를 축으로 객석 쪽으로 th° 회전) */
+var RG=D.plan.riser,GH=RG.Wc/2,GC=Math.cos(RG.th*Math.PI/180),GS=Math.sin(RG.th*Math.PI/180);
+function tp(x,k,off){var a=Math.abs(x),sg=x<0?-1:1,d=k*RG.D+off;if(a<GH)return [x,RG.yF+d];var q=a-GH;return [sg*(GH+q*GC+d*GS),RG.yF-q*GS+d*GC];}
+function PG(pts,o){o=o||{};return '<polygon points="'+pts.map(function(p){return X(p[0]).toFixed(1)+','+Y(p[1]).toFixed(1);}).join(' ')+'" fill="'+(o.f||'none')+'" stroke="'+(o.s||'none')+'" stroke-width="'+(o.sw||1)+'"'+(o.d?' stroke-dasharray="'+o.d+'"':'')+(o.op?' opacity="'+o.op+'"':'')+'/>';}
+function RR(x0,x1,k,f0,f1,o){return PG([tp(x0,k,f0),tp(x1,k,f0),tp(x1,k,f1),tp(x0,k,f1)],o);}
+NS.geo={tp:tp,GH:GH,GC:GC,GS:GS,RG:RG};
+
 NS.planSvg=function(c,opt){
  opt=opt||{};var master=!!opt.master,cp=!!opt.compact;
  c=c||{code:'',kind:'song',mics:[],scrim:'up'};
  var fs=cp?15:11, o='';
- var vb=cp?[0,OY-10.9*SC-10,OX*2,(10.9+3.3)*SC+20]:[0,-32,960,822];
+ var vb=cp?[0,OY-12.1*SC-10,OX*2,(12.1+3.3)*SC+20]:[0,-32,960,822];
  o+='<svg xmlns="http://www.w3.org/2000/svg" viewBox="'+vb.join(' ')+'" font-family="Pretendard Variable,Pretendard,Apple SD Gothic Neo,sans-serif" role="img" aria-label="무대 평면도">';
  o+='<rect x="'+vb[0]+'" y="'+vb[1]+'" width="'+vb[2]+'" height="'+vb[3]+'" fill="#fff"/>';
  // 1m grid
@@ -70,18 +77,20 @@ NS.planSvg=function(c,opt){
  var sd=(master||c.scrim==='down');
  o+=L(-7.5,1.18,7.5,1.18,{c:'#8944ab',w:sd?6:3,op:sd?1:.55,d:sd?null:'8 5'});
  if(!cp)o+=T(-7.0,1.5,'샤막 W15×H9 (#1 장치봉 1.18m, 안)',{a:'start',s:fs-1,c:'#8944ab',w:600});
- // 덧마루 단
+ // 덧마루 30×3 내모임형 (중앙부 + 좌우 날개 + 쐐기 보정판)
  var tiers=D.plan.tiers;var m1=(tiers[0].y0+tiers[0].y1)/2,m2=(tiers[1].y0+tiers[1].y1)/2,m3=(tiers[2].y0+tiers[2].y1)/2,yTop=tiers[2].y1,yBot=tiers[0].y0;
+ var TF=['#ececef','#e2e2e6','#d6d6dc'];
+ [-1,1].forEach(function(sg){var bi=[sg*(GH+RG.N*RG.D*GS),RG.yF+RG.N*RG.D*GC];o+=PG([[sg*GH,RG.yF],[sg*GH,yTop],bi],{f:'#fdecea',s:'#c0392b',sw:1,d:'4 3',op:cp?.8:1});});
  tiers.forEach(function(t,i){
-  var fill=['#ececef','#e2e2e6','#d6d6dc'][i];
-  o+=R(-D.plan.xout,t.y1,D.plan.xout*2,t.y1-t.y0,{f:fill,s:'#8e8e93',sw:1,op:cp?.9:1});
-  o+=T(6.3,(t.y0+t.y1)/2-0.05,t.n+'단',{s:fs-2,c:'#6e6e73',w:700});
+  o+=R(-GH,t.y1,GH*2,RG.D,{f:TF[i],s:'#8e8e93',sw:1,op:cp?.9:1});
+  [-1,1].forEach(function(sg){o+=RR(sg*GH,sg*(GH+RG.Lw),i,0,RG.D,{f:TF[i],s:'#8e8e93',sw:1,op:cp?.9:1});});
  });
+ [-1,1].forEach(function(sg){o+='<circle cx="'+X(sg*GH)+'" cy="'+Y(RG.yF)+'" r="3.5" fill="#fff" stroke="#c0392b" stroke-width="1.6"/>';});
  o+=R(-D.plan.xout,12.93,D.plan.xout*2,12.93-yTop,{f:'#eef5ff',s:'none'});
  if(!cp){
-  [-1,1].forEach(function(sg){o+=R(sg>0?D.plan.xout:-D.plan.xout-0.6,tiers[0].y1,0.6,tiers[0].y1-tiers[0].y0,{f:'#fff',s:'#0071e3',sw:1.2,d:'3 2'})+T(sg*(D.plan.xout+0.3),m1-0.05,'승강',{s:8,c:'#0071e3',w:700});});
+  [-1,1].forEach(function(sg){var xs=sg*(GH+RG.Lw);o+=RR(xs,xs+sg*0.6,0,0,RG.D,{f:'#fff',s:'#0071e3',sw:1.2,d:'3 2'});var q=tp(xs+sg*0.3,0,RG.D/2);o+=T(q[0],q[1]-0.05,'승강',{s:8,c:'#0071e3',w:700});});
   o+=L(-7.15,1.18,-7.15,yBot,{c:'#1d1d1f',w:1})+L(-7.3,1.18,-7.0,1.18,{c:'#1d1d1f',w:1})+L(-7.3,yBot,-7.0,yBot,{c:'#1d1d1f',w:1})+T(-7.25,(1.18+yBot)/2,'연기 공간 '+(yBot-1.18).toFixed(1)+'m (샤막~1단)',{s:9,c:'#1d1d1f',w:600,r:-90});
-  tiers.forEach(function(t){o+=T(-3.8,t.y0-0.25,t.n+'단  '+t.y0.toFixed(1)+'–'+t.y1.toFixed(1)+'m',{s:9,c:'#86868b'});});
+  [['1단 +0.30',0],['2단 +0.60',1],['3단 +0.90',2]].forEach(function(l){o+=R(-6.55+l[1]*1.9,12.55,0.3,0.25,{f:TF[l[1]],s:'#8e8e93',sw:1})+T(-6.15+l[1]*1.9,12.34,l[0]+'m',{s:9,c:'#6e6e73',w:700,a:'start'});});o+=T(-6.55,12.74,'덧마루 30cm × 3단 · 15×15×30 모듈 21개 · 날개 15° 내모임형',{s:9,c:'#c0392b',w:700,a:'start'});
   o+=L(7.0,yTop,7.0,12.93,{c:'#0071e3',w:1.5})+L(6.8,yTop,7.2,yTop,{c:'#0071e3',w:1.5})+L(6.8,12.93,7.2,12.93,{c:'#0071e3',w:1.5})+T(7.15,(yTop+12.93)/2,'후방 간격 '+(12.93-yTop).toFixed(1)+'m · 후방 통로',{a:'start',s:9,c:'#0071e3',w:700});
  }
  function g(name,svgStr,label,lx,ly){var s=stateOf(c,name,master);if(s==='none')return '';var op=s==='play'?1:.38;return '<g opacity="'+op+'">'+svgStr+(s==='play'||master?(label?T(lx,ly,label,{s:fs-(cp?1:1),w:700}):''):'')+'</g>';}
@@ -91,20 +100,21 @@ NS.planSvg=function(c,opt){
  o+=g('gugak_center',gc,master?'1번 돗자리 6.8×3.0m':'국악기 5인 · 돗자리 6.8×3.0m (1번)',0,master?4.05:3.75);
  var LY=D.plan.layout;
  // 국악기 (2단 우측: 대금 · 피리 · 가야금 · 아쟁)
- var gb='';LY.t2g.forEach(function(it){gb+=C(it.x,m2,.3,{f:'#c93400'})+T(it.x,m2+0.55,it.l,{s:fs-4,c:'#c93400'});});
- o+=g('gugak_back',gb,'국악기 4인 (2번~)',3.6,tiers[1].y0+0.25);
+ var gb='';LY.t2g.forEach(function(it){var q=tp(it.x,1,it.o);gb+=C(q[0],q[1],.17,{f:'#c93400'})+T(q[0],q[1]-0.4,it.l,{s:fs-4,c:'#c93400'});});gb+=T(tp(3.75,1,1.25)[0],tp(3.75,1,1.25)[1],'국악기 4인',{s:cp?11:9,c:'#c93400',w:700});
+ o+=g('gugak_back',gb,'',0,0);
  // 스트링 (1단 앞줄: Vn 4, Va 2, Vc 4)
- var sg='';LY.t1.forEach(function(it){sg+=R(it.x-.25,m1+.3,.5,.57,{f:'#0071e3'})+T(it.x,m1-0.5,it.l,{s:fs-4,c:'#0071e3'});});
+ var sg='';LY.t1.forEach(function(it){var p0=tp(it.x-.25,0,0.7),p1=tp(it.x+.25,0,0.7),p2=tp(it.x+.25,0,1.27),p3=tp(it.x-.25,0,1.27),q=tp(it.x,0,0.3);sg+=PG([p0,p1,p2,p3],{f:'#0071e3'})+T(q[0],q[1],it.l,{s:fs-4,c:'#0071e3'});});
  o+=g('strings',sg,'스트링 10인 (Vn 4 · Va 2 · Vc 4)',0,tiers[0].y0-0.25);
  // 3단: Gt · E.B · Dr · 모둠북 · 건반 2
  var bd='',dr='',pc='';
  LY.t3.forEach(function(it){
-  if(it.k==='gt'||it.k==='eb')bd+=C(it.x,m3+.3,.3,{f:'#1d1d1f'})+T(it.x,m3-.4,it.l,{s:fs-3});
-  else if(it.k==='kb')bd+=R(it.x-.65,m3+.6,1.3,.4,{f:'#1d1d1f'})+T(it.x,m3-.2,it.l,{s:fs-3});
-  else if(it.k==='dr')dr=C(it.x,m3+.1,.85,{f:'#1d1d1f',op:.85})+T(it.x,m3+.1,'Dr',{s:fs-2,c:'#fff',w:700});
-  else if(it.k==='pc')pc=C(it.x-0.45,m3+.1,.45,{f:'#c93400'})+C(it.x+0.5,m3+.1,.45,{f:'#c93400'})+T(it.x+0.03,m3-.7,it.l,{s:fs-3,c:'#c93400'});
+  var q=tp(it.x,2,0.75),ql=tp(it.x,2,0.3);
+  if(it.k==='gt'||it.k==='eb'){q=tp(it.x,2,1.05);bd+=C(q[0],q[1],.25,{f:'#1d1d1f'})+T(ql[0],ql[1],it.l,{s:fs-3});}
+  else if(it.k==='kb'){bd+=RR(it.x-.65,it.x+.65,2,0.85,1.25,{f:'#1d1d1f'})+T(ql[0],ql[1]+0.1,it.l,{s:fs-3});}
+  else if(it.k==='dr'){dr=C(q[0],q[1],.62,{f:'#1d1d1f',op:.85})+T(q[0],q[1]-0.04,'Dr',{s:fs-2,c:'#fff',w:700});}
+  else if(it.k==='pc'){var q1=tp(it.x-0.33,2,0.75),q2=tp(it.x+0.33,2,0.75);pc=C(q1[0],q1[1],.3,{f:'#c93400'})+C(q2[0],q2[1],.3,{f:'#c93400'})+T(q[0]+0.03,ql[1],it.l,{s:fs-3,c:'#c93400'});}
  });
- o+=g('band',bd,'3단: Gt · E.B · 건반 2',-0.8,yTop+0.4);
+ o+=g('band',bd,'3단: Gt · E.B · Dr · 모둠북 · 건반 2',0,yTop+0.4);
  o+=g('drums',dr,'',0,0);
  o+=g('perc',pc,'',0,0);
  // 보컬
@@ -114,8 +124,8 @@ NS.planSvg=function(c,opt){
  var dv=C(2.2,1.9,.35,{f:'#0071e3'})+C(-2.2,1.9,.35,{f:'#0071e3'})+T(2.2,1.0,v[0]||'',{s:fs-2,c:'#0071e3',w:700})+T(-2.2,1.0,v[1]||'',{s:fs-2,c:'#0071e3',w:700});
  o+=g('duo',dv,'',0,0);
  var cn=master?4:(c.chorus||0);
- var ch='';LY.t2c.forEach(function(x,k){ch+='<circle cx="'+X(x)+'" cy="'+Y(m2+0.45)+'" r="5" fill="none" stroke="#6e6e73" stroke-width="1.5"/><line x1="'+X(x)+'" y1="'+Y(m2+0.45)+'" x2="'+X(x)+'" y2="'+Y(m2+0.05)+'" stroke="#6e6e73" stroke-width="1.5"/>'+((k<cn&&!master)?C(x,m2-0.2,.28,{f:'#6e6e73'}):C(x,m2-0.2,.28,{f:'none',s:'#b9b9c0'}));});
- if(cn>0||master)o+=g('chorus',ch+T(-4.2,tiers[1].y0+0.25,master?'코러스 4석 · 스탠드 4':'코러스 '+cn+'명 사용 · 스탠드 4',{s:fs-1,w:700,c:'#6e6e73'}),'',0,0);
+ var ch='';LY.t2c.forEach(function(c2,k){var qs=tp(c2.x,1,c2.o+0.32),qm=tp(c2.x,1,c2.o);ch+='<circle cx="'+X(qs[0])+'" cy="'+Y(qs[1])+'" r="4" fill="none" stroke="#6e6e73" stroke-width="1.5"/><line x1="'+X(qs[0])+'" y1="'+Y(qs[1])+'" x2="'+X(qm[0])+'" y2="'+Y(qm[1]+0.15)+'" stroke="#6e6e73" stroke-width="1.5"/>'+((k<cn&&!master)?C(qm[0],qm[1],.17,{f:'#6e6e73'}):C(qm[0],qm[1],.17,{f:'none',s:'#b9b9c0'}));});
+ if(cn>0||master)o+=g('chorus',ch+T(tp(-3.75,1,1.25)[0],tp(-3.75,1,1.25)[1],master?'코러스 4석 · 스탠드 4':'코러스 '+cn+'명 · 스탠드 4',{s:cp?11:9,w:700,c:'#6e6e73'}),'',0,0);
  var en='';for(var i=-3;i<=3;i++){en+=C(i*1.0,3.4,.28,{f:'#1d1d1f'})+C(i*1.0,2.4,.28,{f:'#1d1d1f'});}
  if(!master)o+=g('ensemble',en+T(0,4.1,'보컬 앙상블 14명 (2열×7)',{s:fs-1,w:700}),'',0,0);
  var pm=[[-8.3,4.1],[-8.3,4.9],[8.3,4.1],[8.3,4.9]].map(function(p){return C(p[0],p[1],.3,{f:'#8944ab'});}).join('');
@@ -136,7 +146,7 @@ NS.planSvg=function(c,opt){
   [[-8.6,7.0],[-8.6,10.0],[-8.6,2.8]].forEach(function(p){o+=R(p[0],p[1],1.0,1.0,{f:'#fff7ec',s:'#e08a00',sw:1});});
   [[7.6,7.0],[7.6,10.0],[7.6,2.8]].forEach(function(p){o+=R(p[0],p[1],1.0,1.0,{f:'#fff7ec',s:'#e08a00',sw:1});});
   o+=T(-8.1,6.4,'조명타워',{s:8,c:'#e08a00'})+T(8.1,6.4,'조명타워',{s:8,c:'#e08a00'});
-  o+=L(-7.0,14.1,7.0,14.1,{c:'#0071e3',w:1.5,d:'6 4'})+T(0,14.3,'SR ↔ SL 후방 크로스오버 (흑막 13.70m ~ 뒷벽 15.4m)',{s:fs-2,c:'#0071e3'});
+  o+=L(-7.0,14.1,7.0,14.1,{c:'#0071e3',w:1.5,d:'6 4'})+T(0,14.3,'SR ↔ SL 후방 크로스오버 (화이트막 13.70m ~ 뒷벽 15.4m)',{s:fs-2,c:'#0071e3'});
   // 모니터
   o+=R(-3.3,1.2,.8,.5,{f:'#e5e5ea',s:'#8e8e93'})+R(2.5,1.2,.8,.5,{f:'#e5e5ea',s:'#8e8e93'})+T(0,0.95,'',{});
  }
@@ -218,8 +228,9 @@ NS.rundownSvg=function(o){
  return s+'</svg>';
 };
 
-/* 단면도: 덧마루 단 높이 비교 (A 15cm 단위 / B 30cm 단위) */
+/* 단면도: 덧마루 30×3 (30 / 60 / 90cm). 2 · 3단은 아래 단 위에 쌓지 않고 받침 장치로 지지 (받침 장치 형식은 확인 필요) */
 NS.sectionSvg=function(h,title){
+ h=h||0.30;
  var s=52,ox=40,oy=520;function x(y){return ox+(y+2.2)*s;}function z(v){return oy-v*s;}
  var o='<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 580" font-family="Pretendard Variable,Pretendard,Apple SD Gothic Neo,sans-serif" role="img" aria-label="무대 단면도">';
  o+='<rect width="900" height="580" fill="#fff"/>';
@@ -229,14 +240,17 @@ NS.sectionSvg=function(h,title){
  o+='<line x1="'+x(1.18)+'" y1="'+z(0.0)+'" x2="'+x(1.18)+'" y2="'+z(9.0)+'" stroke="#8944ab" stroke-width="4"/><text x="'+(x(1.18)+6)+'" y="'+z(8.5)+'" font-size="10" fill="#8944ab" font-weight="600">샤막 H9m (#1 장치봉 1.18m)</text>';
  [[5.78,'조명봉 #2 · 5.78m'],[9.23,'조명봉 #3 · 9.23m']].forEach(function(l){o+='<line x1="'+x(l[0])+'" y1="'+z(9.2)+'" x2="'+x(l[0])+'" y2="'+z(0.8)+'" stroke="#e08a00" stroke-dasharray="4 4"/><text x="'+x(l[0])+'" y="'+(z(9.2)-5)+'" font-size="9" fill="#e08a00" text-anchor="middle">'+l[1]+'</text>';});
  o+='<line x1="'+x(12.93)+'" y1="'+z(0)+'" x2="'+x(12.93)+'" y2="'+z(9.0)+'" stroke="#333" stroke-width="3"/><text x="'+(x(12.93)-6)+'" y="'+z(8.6)+'" font-size="10" fill="#333" text-anchor="end">하늘막 12.93m</text>';
- var tiers=D.plan.tiers;
- tiers.forEach(function(t,i){var hh=h*(i+1);o+='<rect x="'+x(t.y0)+'" y="'+z(hh)+'" width="'+((t.y1-t.y0)*s)+'" height="'+(hh*s)+'" fill="'+['#ececef','#e2e2e6','#d6d6dc'][i]+'" stroke="#8e8e93"/><text x="'+(x(t.y0)+(t.y1-t.y0)*s/2)+'" y="'+(oy+18)+'" font-size="11" font-weight="700" text-anchor="middle" fill="#1d1d1f">'+t.n+'단 '+Math.round(hh*100)+'cm</text>';});
+ var tiers=D.plan.tiers,DV=0.25;
+ tiers.forEach(function(t,i){var top=h*(i+1),bot=h*i,fill=['#ececef','#e2e2e6','#d6d6dc'][i];
+  if(i>0){[[t.y0,'앞'],[t.y1-DV,'뒤']].forEach(function(d){o+='<rect x="'+x(d[0])+'" y="'+z(bot)+'" width="'+(DV*s)+'" height="'+(bot*s)+'" fill="#fff3e8" stroke="#c93400" stroke-width="1.2"/><line x1="'+x(d[0])+'" y1="'+z(bot)+'" x2="'+(x(d[0])+DV*s)+'" y2="'+z(0)+'" stroke="#c93400"/><line x1="'+(x(d[0])+DV*s)+'" y1="'+z(bot)+'" x2="'+x(d[0])+'" y2="'+z(0)+'" stroke="#c93400"/>';});}
+  o+='<rect x="'+x(t.y0)+'" y="'+z(top)+'" width="'+((t.y1-t.y0)*s)+'" height="'+(h*s)+'" fill="'+fill+'" stroke="#8e8e93"/><text x="'+(x(t.y0)+(t.y1-t.y0)*s/2)+'" y="'+(oy+18)+'" font-size="11" font-weight="700" text-anchor="middle" fill="#1d1d1f">'+t.n+'단 '+Math.round(top*100)+'cm</text>';});
+ o+='<text x="'+x(9.9)+'" y="'+(oy+58)+'" font-size="10" fill="#c93400" font-weight="700" text-anchor="middle">주황 교차 표시 = 받침 장치 (2 · 3단 모듈 앞 · 뒤 끝 아래) · 모듈 1.5 × 1.5 × 0.30m</text>';
  function person(py,base,hgt,col){return '<circle cx="'+x(py)+'" cy="'+z(base+hgt-0.12)+'" r="'+(0.12*s)+'" fill="'+col+'"/><rect x="'+(x(py)-0.13*s)+'" y="'+z(base+hgt-0.25)+'" width="'+(0.26*s)+'" height="'+((hgt-0.25)*s)+'" rx="4" fill="'+col+'"/>';}
  var m3s=(tiers[2].y0+tiers[2].y1)/2;o+=person(m3s,h*3,1.7,'#1d1d1f')+'<text x="'+x(m3s)+'" y="'+(z(h*3+1.7)-8)+'" font-size="9" text-anchor="middle" fill="#1d1d1f">연주자 1.7m</text>';
  o+=person(2.0,0,1.7,'#0071e3');
  o+='<text x="'+x(tiers[2].y1+0.3)+'" y="'+(z(h*3)+16)+'" font-size="10" fill="#d70015" font-weight="700">후면 지지대 없음</text><text x="'+x((tiers[2].y1+12.93)/2)+'" y="'+(z(2.6))+'" font-size="10" fill="#0071e3" font-weight="700" text-anchor="middle">후방 간격 '+(12.93-tiers[2].y1).toFixed(1)+'m</text><line x1="'+x(tiers[2].y1)+'" y1="'+z(2.2)+'" x2="'+x(12.93)+'" y2="'+z(2.2)+'" stroke="#0071e3" stroke-width="1.5"/>';
  o+='<line x1="'+x(tiers[2].y1)+'" y1="'+z(h*3)+'" x2="'+x(tiers[2].y1)+'" y2="'+z(0)+'" stroke="#d70015" stroke-width="2" stroke-dasharray="3 3"/>';
- o+='<text x="880" y="26" font-size="15" font-weight="700" fill="#1d1d1f" text-anchor="end">'+title+'</text>';
+ o+='<text x="880" y="26" font-size="15" font-weight="700" fill="#1d1d1f" text-anchor="end">'+(title||'30cm × 3단 (30 / 60 / 90cm)')+'</text>';
  o+='<text x="'+x(-1.9)+'" y="'+(oy+40)+'" font-size="11" fill="#6e6e73">◀ 객석 (DOWNSTAGE)</text><text x="'+x(13.7)+'" y="'+(oy+40)+'" font-size="11" fill="#6e6e73" text-anchor="end">무대 뒤 (UPSTAGE) ▶</text>';
  return o+'</svg>';
 };
