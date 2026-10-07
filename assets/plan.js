@@ -90,7 +90,7 @@ NS.planSvg=function(c,opt){
  if(!cp){
   [-1,1].forEach(function(sg){var xs=sg*(GH+RG.Lw);o+=RR(xs,xs+sg*0.6,0,0,RG.D,{f:'#fff',s:'#0071e3',sw:1.2,d:'3 2'});var q=tp(xs+sg*0.3,0,RG.D/2);o+=T(q[0],q[1]-0.05,'승강',{s:8,c:'#0071e3',w:700});});
   o+=L(-7.15,1.18,-7.15,yBot,{c:'#1d1d1f',w:1})+L(-7.3,1.18,-7.0,1.18,{c:'#1d1d1f',w:1})+L(-7.3,yBot,-7.0,yBot,{c:'#1d1d1f',w:1})+T(-7.25,(1.18+yBot)/2,'연기 공간 '+(yBot-1.18).toFixed(1)+'m (샤막~1단)',{s:9,c:'#1d1d1f',w:600,r:-90});
-  [['1단 +0.30',0],['2단 +0.60',1],['3단 +0.90',2]].forEach(function(l){o+=R(-6.55+l[1]*1.9,12.55,0.3,0.25,{f:TF[l[1]],s:'#8e8e93',sw:1})+T(-6.15+l[1]*1.9,12.34,l[0]+'m',{s:9,c:'#6e6e73',w:700,a:'start'});});o+=T(-6.55,12.74,'덧마루 30cm × 3단 · 15×15×30 모듈 21개 · 날개 15° 내모임형',{s:9,c:'#c0392b',w:700,a:'start'});
+  [['1단 +0.30',0],['2단 +0.60',1],['3단 +0.90',2]].forEach(function(l){o+=R(-6.55+l[1]*1.9,12.55,0.3,0.25,{f:TF[l[1]],s:'#8e8e93',sw:1})+T(-6.15+l[1]*1.9,12.34,l[0]+'m',{s:9,c:'#6e6e73',w:700,a:'start'});});
   o+=L(7.0,yTop,7.0,12.93,{c:'#0071e3',w:1.5})+L(6.8,yTop,7.2,yTop,{c:'#0071e3',w:1.5})+L(6.8,12.93,7.2,12.93,{c:'#0071e3',w:1.5})+T(7.15,(yTop+12.93)/2,'후방 간격 '+(12.93-yTop).toFixed(1)+'m · 후방 통로',{a:'start',s:9,c:'#0071e3',w:700});
  }
  function g(name,svgStr,label,lx,ly){var s=stateOf(c,name,master);if(s==='none')return '';var op=s==='play'?1:.38;return '<g opacity="'+op+'">'+svgStr+(s==='play'||master?(label?T(lx,ly,label,{s:fs-(cp?1:1),w:700}):''):'')+'</g>';}
@@ -228,7 +228,7 @@ NS.rundownSvg=function(o){
  return s+'</svg>';
 };
 
-/* 단면도: 덧마루 30×3 (30 / 60 / 90cm). 2 · 3단은 아래 단 위에 쌓지 않고 받침 장치로 지지 (받침 장치 형식은 확인 필요) */
+/* 단면도: 덧마루 30×3 (30 / 60 / 90cm). 1 · 2단 15cm × 2겹, 3단 30cm 1장, 2 · 3단은 받침 장치로 지지 */
 NS.sectionSvg=function(h,title){
  h=h||0.30;
  var s=52,ox=40,oy=520;function x(y){return ox+(y+2.2)*s;}function z(v){return oy-v*s;}
@@ -243,8 +243,8 @@ NS.sectionSvg=function(h,title){
  var tiers=D.plan.tiers,DV=0.25;
  tiers.forEach(function(t,i){var top=h*(i+1),bot=h*i,fill=['#ececef','#e2e2e6','#d6d6dc'][i];
   if(i>0){[[t.y0,'앞'],[t.y1-DV,'뒤']].forEach(function(d){o+='<rect x="'+x(d[0])+'" y="'+z(bot)+'" width="'+(DV*s)+'" height="'+(bot*s)+'" fill="#fff3e8" stroke="#c93400" stroke-width="1.2"/><line x1="'+x(d[0])+'" y1="'+z(bot)+'" x2="'+(x(d[0])+DV*s)+'" y2="'+z(0)+'" stroke="#c93400"/><line x1="'+(x(d[0])+DV*s)+'" y1="'+z(bot)+'" x2="'+x(d[0])+'" y2="'+z(0)+'" stroke="#c93400"/>';});}
-  o+='<rect x="'+x(t.y0)+'" y="'+z(top)+'" width="'+((t.y1-t.y0)*s)+'" height="'+(h*s)+'" fill="'+fill+'" stroke="#8e8e93"/><text x="'+(x(t.y0)+(t.y1-t.y0)*s/2)+'" y="'+(oy+18)+'" font-size="11" font-weight="700" text-anchor="middle" fill="#1d1d1f">'+t.n+'단 '+Math.round(top*100)+'cm</text>';});
- o+='<text x="'+x(9.9)+'" y="'+(oy+58)+'" font-size="10" fill="#c93400" font-weight="700" text-anchor="middle">주황 교차 표시 = 받침 장치 (2 · 3단 모듈 앞 · 뒤 끝 아래) · 모듈 1.5 × 1.5 × 0.30m</text>';
+  o+='<rect x="'+x(t.y0)+'" y="'+z(top)+'" width="'+((t.y1-t.y0)*s)+'" height="'+(h*s)+'" fill="'+fill+'" stroke="#8e8e93"/>'+(i<2?'<line x1="'+x(t.y0)+'" y1="'+z(top-0.15)+'" x2="'+x(t.y1)+'" y2="'+z(top-0.15)+'" stroke="#8e8e93"/>':'')+'<text x="'+(x(t.y0)+(t.y1-t.y0)*s/2)+'" y="'+(oy+18)+'" font-size="11" font-weight="700" text-anchor="middle" fill="#1d1d1f">'+t.n+'단 '+Math.round(top*100)+'cm</text>';});
+ o+='<text x="'+x(9.9)+'" y="'+(oy+58)+'" font-size="10" fill="#c93400" font-weight="700" text-anchor="middle">주황 교차 표시 = 받침 장치 (2 · 3단 앞 · 뒤 끝 아래) · 1 · 2단 15cm × 2겹, 3단 30cm 1장</text>';
  function person(py,base,hgt,col){return '<circle cx="'+x(py)+'" cy="'+z(base+hgt-0.12)+'" r="'+(0.12*s)+'" fill="'+col+'"/><rect x="'+(x(py)-0.13*s)+'" y="'+z(base+hgt-0.25)+'" width="'+(0.26*s)+'" height="'+((hgt-0.25)*s)+'" rx="4" fill="'+col+'"/>';}
  var m3s=(tiers[2].y0+tiers[2].y1)/2;o+=person(m3s,h*3,1.7,'#1d1d1f')+'<text x="'+x(m3s)+'" y="'+(z(h*3+1.7)-8)+'" font-size="9" text-anchor="middle" fill="#1d1d1f">연주자 1.7m</text>';
  o+=person(2.0,0,1.7,'#0071e3');
